@@ -50,15 +50,15 @@ type TabType =
 
 
 ``` 
-Receiver Address : YH42RFFBOYZYNRXZ3DD2FMWZMU5426HT4PQZRSUOLW242NPXYX32JZUHXQ 
+YH42RFFBOYZYNRXZ3DD2FMWZMU5426HT4PQZRSUOLW242NPXYX32JZUHXQ 
 ```
 
 ```
-AssetId: 10458941
+10458941
 ```
 
 ```
-Tickers: eth,algo,sol,btc 
+eth,algo,sol,btc 
 ```
 
 ```
