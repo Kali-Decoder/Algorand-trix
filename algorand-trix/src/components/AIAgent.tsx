@@ -28,6 +28,8 @@ import {
   Blocks,
   ChartNoAxesCombined,
   HandCoins,
+  ArrowUpDown,
+  ArrowBigUp,
 } from "lucide-react";
 
 import ResponseDisplay from "./ResponseDisplay";
@@ -45,6 +47,7 @@ type TabType =
   | "swap"
   | "lend"
   | "trade"
+  | "swap-tokens"
   | "mint"
   | "mint-token"
   | "transfer-token"
@@ -1160,15 +1163,15 @@ export default function AIAgent() {
   }
 
 
-const generateIntegrationFunction = (abi: { name: string; methods: any[] }) => {
-  return abi.methods.map((method) => {
-    const { name, args, readonly } = method;
+  const generateIntegrationFunction = (abi: { name: string; methods: any[] }) => {
+    return abi.methods.map((method) => {
+      const { name, args, readonly } = method;
 
-    // Extract parameter names
-    const paramNames = (args || []).map((arg) => arg.name).join(", ");
+      // Extract parameter names
+      const paramNames = (args || []).map((arg) => arg.name).join(", ");
 
-    // Generate function template
-    const functionCode = `
+      // Generate function template
+      const functionCode = `
 const ${name} = async (${paramNames}) => {
   if (!appId) {
     enqueueSnackbar("Please deploy contract first", { variant: "error" });
@@ -1183,16 +1186,15 @@ const ${name} = async (${paramNames}) => {
       defaultSigner: TransactionSigner,
     });
 
-    ${
-      readonly
-        ? `// Readonly call
+    ${readonly
+          ? `// Readonly call
     const result = await client.get.${name}({ args: [${paramNames}] });
     enqueueSnackbar("${name} executed! Result: " + result, { variant: "success" });`
-        : `// On-chain transaction
+          : `// On-chain transaction
     await client.send.${name}({ args: [${paramNames}], sender: activeAddress ?? undefined });
 
     enqueueSnackbar("${name} executed successfully!", { variant: "success" });`
-    }
+        }
   } catch (e) {
     enqueueSnackbar(\`Error in ${name}: \${(e as Error).message}\`, { variant: "error" });
     console.error("${name} Error:", e);
@@ -1201,90 +1203,90 @@ const ${name} = async (${paramNames}) => {
   }
 };`;
 
-    return functionCode;
-  });
-};
+      return functionCode;
+    });
+  };
 
 
 
- const handleGenerateSubmit = async (
-  userInput: string,
-  setMessages: (fn: (prev: any[]) => any[]) => void
-) => {
-  try {
-    const lowerInput = userInput.trim().toLowerCase();
+  const handleGenerateSubmit = async (
+    userInput: string,
+    setMessages: (fn: (prev: any[]) => any[]) => void
+  ) => {
+    try {
+      const lowerInput = userInput.trim().toLowerCase();
 
-    if (lowerInput === "generate_function") {
-      setGenerateCommand(true);
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: "Please provide the Contract ABI JSON string.",
-        },
-      ]);
-      return;
-    }
-
-    if (generateCommand) {
-      let inputData;
-      try {
-        const formattedInput = userInput
-          .trim()
-          .replace(/([{,]\s*)(\w+)\s*:/g, '$1"$2":')
-          .replace(/:\s*([a-zA-Z_][\w]*)\s*([,}\]])/g, ':"$1"$2')
-          .replace(/,\s*}/g, "}")
-          .replace(/,\s*]/g, "]");
-
-        inputData = JSON.parse(formattedInput);
-      } catch {
+      if (lowerInput === "generate_function") {
+        setGenerateCommand(true);
         setMessages((prev) => [
           ...prev,
-          { role: "assistant", content: "Invalid JSON format. Please provide a valid ABI JSON." },
+          {
+            role: "assistant",
+            content: "Please provide the Contract ABI JSON string.",
+          },
         ]);
         return;
       }
 
-      if (!inputData.name || !Array.isArray(inputData.methods)) {
+      if (generateCommand) {
+        let inputData;
+        try {
+          const formattedInput = userInput
+            .trim()
+            .replace(/([{,]\s*)(\w+)\s*:/g, '$1"$2":')
+            .replace(/:\s*([a-zA-Z_][\w]*)\s*([,}\]])/g, ':"$1"$2')
+            .replace(/,\s*}/g, "}")
+            .replace(/,\s*]/g, "]");
+
+          inputData = JSON.parse(formattedInput);
+        } catch {
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: "Invalid JSON format. Please provide a valid ABI JSON." },
+          ]);
+          return;
+        }
+
+        if (!inputData.name || !Array.isArray(inputData.methods)) {
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: "Invalid ABI format. Must include 'name' and 'methods' array." },
+          ]);
+          return;
+        }
+
+        // ✅ Generate all functions from this contract ABI
+        const generatedFunctions = generateIntegrationFunction(inputData).join("\n\n");
+
         setMessages((prev) => [
           ...prev,
-          { role: "assistant", content: "Invalid ABI format. Must include 'name' and 'methods' array." },
+          {
+            role: "assistant",
+            content: `Generated functions:\n\`\`\`typescript\n${generatedFunctions}\n\`\`\``,
+          },
         ]);
+
+        setGenerateCommand(false);
         return;
       }
 
-      // ✅ Generate all functions from this contract ABI
-      const generatedFunctions = generateIntegrationFunction(inputData).join("\n\n");
-
+      if (!generateCommand) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content:
+              "Hey, I'm Trix! If you wanna generate an integration function, write 'generate_function' and follow the steps. 🚀",
+          },
+        ]);
+      }
+    } catch {
       setMessages((prev) => [
         ...prev,
-        {
-          role: "assistant",
-          content: `Generated functions:\n\`\`\`typescript\n${generatedFunctions}\n\`\`\``,
-        },
-      ]);
-
-      setGenerateCommand(false);
-      return;
-    }
-
-    if (!generateCommand) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content:
-            "Hey, I'm Trix! If you wanna generate an integration function, write 'generate_function' and follow the steps. 🚀",
-        },
+        { role: "assistant", content: "Error processing input. Please try again." },
       ]);
     }
-  } catch {
-    setMessages((prev) => [
-      ...prev,
-      { role: "assistant", content: "Error processing input. Please try again." },
-    ]);
-  }
-};
+  };
 
 
 
@@ -1507,6 +1509,11 @@ const ${name} = async (${paramNames}) => {
           if (!response) return; // Early return if mint flow ended early
           break;
 
+        case "swap-tokens":
+          response = await handleSwapSubmit(currentInput);
+          if (!response) return; // Early return if mint flow ended early
+          break;
+
         case "transfer-token":
           response = await handleTransferToken(currentInput);
           if (!response) return; // Early return if mint flow ended early
@@ -1526,9 +1533,9 @@ const ${name} = async (${paramNames}) => {
           response = await handleGetQuotes(currentInput);
           if (!response) return; // Early return if mint flow ended early
           break;
-        case "swap":
-          await handleSwapSubmit(currentInput, setMessages, setSwapState);
-          return;
+        // case "swap":
+        //   await handleSwapSubmit(currentInput, setMessages, setSwapState);
+        //   return;
         case "cross-chain":
           await handleCrossChainSubmit(
             currentInput,
@@ -1595,17 +1602,17 @@ const ${name} = async (${paramNames}) => {
       label: "Coding Helper",
       icon: <Code2Icon size={20} />,
     },
-    { id: "mint-token", label: "Tokens", icon: <ArrowRightLeft size={20} /> },
+    { id: "mint-token", label: "Mint Tokens", icon: <ArrowBigUp size={20} /> },
     { id: "lend", label: "Lending", icon: <PiggyBank size={20} /> },
     { id: "trade", label: "Trading", icon: <LineChart size={20} /> },
     { id: "get-quotes", label: "Get Quotes", icon: <ChartNoAxesCombined size={20} /> },
     { id: "transfer-native-token", label: "Transfer ALGO", icon: <HandCoins size={20} /> },
     { id: "transfer-token", label: "Transfer Tokens", icon: <HandCoins size={20} /> },
-    // {
-    //   id: "cross-chain",
-    //   label: "Cross Chain",
-    //   icon: <ArrowUpDown size={20} />,
-    // },
+    {
+      id: "swap-tokens",
+      label: "Swap Tokens",
+      icon: <ArrowRightLeft size={20} />,
+    },
     { id: "mint", label: "Mint", icon: <ImagePlay size={20} /> },
     {
       id: "algorand-helper",
