@@ -17,6 +17,7 @@
     "@cowprotocol/cow-sdk": "^5.10.0-RC.2",
     "@filebase/client": "^0.0.5",
     "@filebase/sdk": "^1.0.6",
+    "@folks-finance/algorand-sdk": "^0.1.9",
     "@layerzerolabs/lz-v2-utilities": "^3.0.70",
     "@layerzerolabs/scan-client": "^0.0.8",
     "@noble/ed25519": "2.3.0",
