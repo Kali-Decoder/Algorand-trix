@@ -167,7 +167,7 @@ export default function AIAgent() {
       algorand.setDefaultSigner(transactionSigner);
       console.log("Connecting to Algorand Testnet...");
 
-      const amount = BigInt(_amount*(10**6));
+      const amount = BigInt(_amount * (10 ** 6));
 
       // 🔹 Fetch token balance
       const accountInfo = await algorand.asset.getAccountInformation(activeAddress, assetId);
@@ -178,7 +178,7 @@ export default function AIAgent() {
         ...prev,
         {
           role: "assistant",
-          content: `💰 You currently have **${Number(balance)/(10**6)} units** of token (ID: ${assetId}) in your wallet.`,
+          content: `💰 You currently have **${Number(balance) / (10 ** 6)} units** of token (ID: ${assetId}) in your wallet.`,
         },
       ]);
 
@@ -753,7 +753,7 @@ export default function AIAgent() {
             Number(pendingTokenTransfer.amount)!
           );
 
-         
+
         } catch (err) {
           console.error("❌ Error sending token:", err);
           setError("Something went wrong while transferring your token. Please try again.");
@@ -1147,177 +1147,146 @@ export default function AIAgent() {
     });
   };
 
-  const generateIntegrationFunction = (abiFunction: AbiFunction) => {
-    const { name, inputs, stateMutability } = abiFunction;
+  interface AbiMethod {
+    name: string;
+    args: { name: string; type: string }[];
+    returns: { type: string };
+    readonly: boolean;
+  }
+
+  interface ContractAbi {
+    name: string;
+    methods: AbiMethod[];
+  }
+
+
+const generateIntegrationFunction = (abi: { name: string; methods: any[] }) => {
+  return abi.methods.map((method) => {
+    const { name, args, readonly } = method;
 
     // Extract parameter names
-    const paramNames = inputs.map((input) => input.name).join(", ");
+    const paramNames = (args || []).map((arg) => arg.name).join(", ");
 
     // Generate function template
     const functionCode = `
-  
-  const ${name} = async (${paramNames}) => {
-    let id = toast.loading("Processing ${name}...");
-    try {
-      const contract = await getContractInstance(
-        Addresses[activeChain]?.mainContractAddress,
-        mainContractABI
-      );
-  
-      if (contract) {
-        const tx = await contract.${name}(${paramNames});
-        ${stateMutability !== "view" && stateMutability !== "pure"
-        ? "await tx.wait();"
-        : ""
-      }
-        toast.success("${name} executed successfully!", { id });
-      }
-    } catch (error) {
-      toast.error("Error in ${name}", { id });
-      console.error("${name} Error:", error);
+const ${name} = async (${paramNames}) => {
+  if (!appId) {
+    enqueueSnackbar("Please deploy contract first", { variant: "error" });
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const client = new ${abi.name}Client({
+      appId: BigInt(appId),
+      algorand,
+      defaultSigner: TransactionSigner,
+    });
+
+    ${
+      readonly
+        ? `// Readonly call
+    const result = await client.get.${name}({ args: [${paramNames}] });
+    enqueueSnackbar("${name} executed! Result: " + result, { variant: "success" });`
+        : `// On-chain transaction
+    await client.send.${name}({ args: [${paramNames}], sender: activeAddress ?? undefined });
+
+    enqueueSnackbar("${name} executed successfully!", { variant: "success" });`
     }
-  };`;
+  } catch (e) {
+    enqueueSnackbar(\`Error in ${name}: \${(e as Error).message}\`, { variant: "error" });
+    console.error("${name} Error:", e);
+  } finally {
+    setLoading(false);
+  }
+};`;
 
     return functionCode;
-  };
+  });
+};
 
-  const handleGenerateSubmit = async (
-    userInput: string,
-    setMessages: (fn: (prev: any[]) => any[]) => void
-  ) => {
-    try {
-      const lowerInput = userInput.trim().toLowerCase();
 
-      // Step 1: User enters "generate_function"
-      if (lowerInput === "generate_function") {
-        setGenerateCommand(true); // Set flag to expect ABI JSON next
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content: "Please provide the Function Signature in JSON string.",
-          },
-        ]);
-        return;
-      }
 
-      // Step 2: User provides JSON input
+ const handleGenerateSubmit = async (
+  userInput: string,
+  setMessages: (fn: (prev: any[]) => any[]) => void
+) => {
+  try {
+    const lowerInput = userInput.trim().toLowerCase();
 
-      if (generateCommand) {
-        // Reset flag after processing
-        let inputData;
-        console.log(userInput, "userInput");
-        if (typeof userInput === "object") {
-          inputData = userInput; // Already an object or array, use it directly
-        } else {
-          try {
-            const formattedInput = userInput
-              .trim() // Remove leading/trailing spaces
-              .replace(/([{,]\s*)(\w+)\s*:/g, '$1"$2":') // Wraps object keys in double quotes
-              .replace(/:\s*([a-zA-Z_][\w]*)\s*([,}\]])/g, ':"$1"$2') // Wraps unquoted string values in double quotes
-              .replace(/,\s*}/g, "}") // Removes trailing commas before }
-              .replace(/,\s*]/g, "]"); // Removes trailing commas before ]
-
-            console.log("Formatted JSON String:", formattedInput);
-
-            inputData = JSON.parse(formattedInput);
-
-            // Ensure parsed input is an array
-            if (!Array.isArray(inputData)) {
-              inputData = [inputData]; // Convert single object to array
-            }
-          } catch (error) {
-            setMessages((prev) => [
-              ...prev,
-              {
-                role: "assistant",
-                content:
-                  "Invalid JSON format. Please provide a valid ABI JSON.",
-              },
-            ]);
-            console.log(error);
-            return;
-          }
-        }
-
-        // Ensure input is an array (if it's a single function, wrap it in an array)
-        if (!Array.isArray(inputData)) {
-          inputData = [inputData];
-        }
-
-        for (const func of inputData) {
-          if (!func.name || !func.inputs) {
-            setMessages((prev) => [
-              ...prev,
-              {
-                role: "assistant",
-                content: `Invalid ABI format: Function '${func.name || "unknown"
-                  }' is missing 'name' or 'inputs' field.`,
-              },
-            ]);
-            return;
-          }
-        }
-
-        const startingText = `  import { ethers } from "ethers";
-  import toast from "react-hot-toast";
-
-   const getContractInstance = async (
-    contractAddress: string,
-    contractAbi: any
-  ): Promise<Contract | undefined> => {
-    try {
-      const contractInstance = new ethers.Contract(
-        contractAddress,
-        contractAbi,
-        signer
-      );
-      return contractInstance;
-    } catch (error) {
-      console.log("Error in deploying contract");
-      return undefined;
-    }
-  };`;
-        // Generate function(s) using ABI
-        const generatedFunctions = inputData
-          .map((func) => generateIntegrationFunction(func))
-          .join("\n\n");
-
-        // Combine the startingText with the generated functions
-        const finalOutput = `${startingText}\n\n${generatedFunctions}`;
-
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content: `Generated functions:\n\`\`\`javascript\n${finalOutput}\n\`\`\``,
-          },
-        ]);
-      }
-
-      // If the input is neither the command nor a valid JSON
-      if (!generateCommand) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content:
-              "Hey, I'm Trix! If you wanna generate an integration function, write 'generate_function' and follow the steps. 🚀",
-          },
-        ]);
-      }
-
-      setGenerateCommand(false);
-    } catch (error) {
+    if (lowerInput === "generate_function") {
+      setGenerateCommand(true);
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: "Error processing input. Please try again.",
+          content: "Please provide the Contract ABI JSON string.",
+        },
+      ]);
+      return;
+    }
+
+    if (generateCommand) {
+      let inputData;
+      try {
+        const formattedInput = userInput
+          .trim()
+          .replace(/([{,]\s*)(\w+)\s*:/g, '$1"$2":')
+          .replace(/:\s*([a-zA-Z_][\w]*)\s*([,}\]])/g, ':"$1"$2')
+          .replace(/,\s*}/g, "}")
+          .replace(/,\s*]/g, "]");
+
+        inputData = JSON.parse(formattedInput);
+      } catch {
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: "Invalid JSON format. Please provide a valid ABI JSON." },
+        ]);
+        return;
+      }
+
+      if (!inputData.name || !Array.isArray(inputData.methods)) {
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: "Invalid ABI format. Must include 'name' and 'methods' array." },
+        ]);
+        return;
+      }
+
+      // ✅ Generate all functions from this contract ABI
+      const generatedFunctions = generateIntegrationFunction(inputData).join("\n\n");
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: `Generated functions:\n\`\`\`typescript\n${generatedFunctions}\n\`\`\``,
+        },
+      ]);
+
+      setGenerateCommand(false);
+      return;
+    }
+
+    if (!generateCommand) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content:
+            "Hey, I'm Trix! If you wanna generate an integration function, write 'generate_function' and follow the steps. 🚀",
         },
       ]);
     }
-  };
+  } catch {
+    setMessages((prev) => [
+      ...prev,
+      { role: "assistant", content: "Error processing input. Please try again." },
+    ]);
+  }
+};
+
+
 
   //handles cross chain
   const handleCrossChainSubmit = async (
