@@ -47,5 +47,34 @@ type TabType =
   | "algorand-helper";
 
 
-YH42RFFBOYZYNRXZ3DD2FMWZMU5426HT4PQZRSUOLW242NPXYX32JZUHXQ 
-10458941
+``` Receiver Address : YH42RFFBOYZYNRXZ3DD2FMWZMU5426HT4PQZRSUOLW242NPXYX32JZUHXQ ```
+``` AssetId: 10458941```
+
+``` Tickers: eth,algo,sol,btc ```
+
+```
+{
+  "name": "Counter",
+  "structs": {},
+  "methods": [
+    {
+      "name": "incr_counter",
+      "args": [],
+      "returns": { "type": "uint64" },
+      "actions": { "create": [], "call": ["NoOp"] },
+      "readonly": false,
+      "events": [],
+      "recommendations": {}
+    },
+    {
+      "name": "decr_counter",
+      "args": [],
+      "returns": { "type": "uint64" },
+      "actions": { "create": [], "call": ["NoOp"] },
+      "readonly": false,
+      "events": [],
+      "recommendations": {}
+    }
+  ]
+}
+```
