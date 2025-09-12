@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextRequest, NextResponse } from "next/server";
 import { ethers } from "ethers";
-import { AINFT_ADDRESS_MAP } from "@/lib/constants";
+// import { AINFT_ADDRESS_MAP } from "@/lib/constants";
 import { AINFT_ABI } from "@/lib/abi";
 import algosdk from 'algosdk';
 
@@ -12,61 +12,61 @@ import { PeraWalletConnect } from "@perawallet/connect";
 const peraWallet = new PeraWalletConnect();
 
 export const deployToken = async () => {
-  try {
-    console.log("Connecting to Algorand Testnet");
+  // try {
+  //   console.log("Connecting to Algorand Testnet");
 
-    // Connect to Algorand Testnet
-    const algodClient = new algosdk.Algodv2(
-      "",
-      "https://testnet-api.algonode.cloud",
-      443
-    );
+  //   // Connect to Algorand Testnet
+  //   const algodClient = new algosdk.Algodv2(
+  //     "",
+  //     "https://testnet-api.algonode.cloud",
+  //     443
+  //   );
 
-    // Ask wallet to connect and get address
-    const accounts = await peraWallet.connect();
-    const address = accounts[0];
+  //   // Ask wallet to connect and get address
+  //   const accounts = await peraWallet.connect();
+  //   const address = accounts[0];
 
-    // Get suggested params
-    const suggestedParams = await algodClient.getTransactionParams().do();
+  //   // Get suggested params
+  //   const suggestedParams = await algodClient.getTransactionParams().do();
 
-    // Create Asset Create transaction
-    console.log("Creating the Token Metadata");
-    const txn = algosdk.makeAssetCreateTxnWithSuggestedParamsFromObject({
-      from: address,
-      suggestedParams,
-      defaultFrozen: false,
-      unitName: "PEPE",
-      assetName: "Pepe Coin",
-      manager: address,
-      reserve: address,
-      freeze: address,
-      clawback: address,
-      total: 1000,
-      decimals: 0,
-    });
+  //   // Create Asset Create transaction
+  //   console.log("Creating the Token Metadata");
+  //   const txn = algosdk.makeAssetCreateTxnWithSuggestedParamsFromObject({
+  //     from: address,
+  //     suggestedParams,
+  //     defaultFrozen: false,
+  //     unitName: "PEPE",
+  //     assetName: "Pepe Coin",
+  //     manager: address,
+  //     reserve: address,
+  //     freeze: address,
+  //     clawback: address,
+  //     total: 1000,
+  //     decimals: 0,
+  //   });
 
-    // Convert txn to wallet format
-    const txnGroup = [{ txn: Buffer.from(txn.toByte()).toString("base64") }];
+  //   // Convert txn to wallet format
+  //   const txnGroup = [{ txn: Buffer.from(txn.toByte()).toString("base64") }];
 
-    // Ask wallet to sign
-    const signedTxns = await peraWallet.signTransaction([txnGroup]);
+  //   // Ask wallet to sign
+  //   const signedTxns = await peraWallet.signTransaction([txnGroup]);
 
-    // Send transaction
-    const { txId } = await algodClient
-      .sendRawTransaction(signedTxns.map((t) => new Uint8Array(Buffer.from(t, "base64"))))
-      .do();
+  //   // Send transaction
+  //   const { txId } = await algodClient
+  //     .sendRawTransaction(signedTxns.map((t) => new Uint8Array(Buffer.from(t, "base64"))))
+  //     .do();
 
-    // Wait for confirmation
-    const result = await algosdk.waitForConfirmation(algodClient, txId, 3);
+  //   // Wait for confirmation
+  //   const result = await algosdk.waitForConfirmation(algodClient, txId, 3);
 
-    console.log("Token deployed ✅");
-    const assetIndex = result["asset-index"];
-    console.log(`Asset ID created: ${assetIndex}`);
-    console.log(`Explorer URL: https://lora.algokit.io/testnet/asset/${assetIndex}`);
+  //   console.log("Token deployed ✅");
+  //   const assetIndex = result["asset-index"];
+  //   console.log(`Asset ID created: ${assetIndex}`);
+  //   console.log(`Explorer URL: https://lora.algokit.io/testnet/asset/${assetIndex}`);
 
-  } catch (err) {
-    console.error("Error deploying token:", err);
-  }
+  // } catch (err) {
+  //   console.error("Error deploying token:", err);
+  // }
 };
 
 
