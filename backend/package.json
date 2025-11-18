@@ -1,0 +1,37 @@
+{
+  "name": "algorand-trix-backend",
+  "version": "1.0.0",
+  "description": "Backend services for Algorand-trix including web scraping and data processing",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "scrape": "tsx src/scraper.ts",
+    "process": "tsx src/data-processor.ts",
+    "lint": "eslint src --ext .ts"
+  },
+  "keywords": [
+    "scraper",
+    "backend",
+    "algorand"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "cheerio": "^1.0.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/cheerio": "^0.22.35",
+    "@types/node": "^20",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^9",
+    "tsx": "^4.19.2",
+    "typescript": "^5"
+  }
+}
+
