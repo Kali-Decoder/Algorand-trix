@@ -30,6 +30,7 @@ import {
   HandCoins,
   ArrowUpDown,
   ArrowBigUp,
+  Network,
 } from "lucide-react";
 
 import ResponseDisplay from "./ResponseDisplay";
@@ -55,7 +56,8 @@ type TabType =
   | "get-quotes"
   | "cross-chain"
   | "generate"
-  | "algorand-helper";
+  | "algorand-helper"
+  | "ecosystem-project";
 
 export default function AIAgent() {
 
@@ -378,7 +380,7 @@ export default function AIAgent() {
 
 
   React.useEffect(() => {
-    if (!activeAddress && activeTab !== "general") {
+    if (!activeAddress && activeTab !== "general" && activeTab !== "ecosystem-project") {
       setActiveTab("general");
     }
   }, [activeAddress, activeTab]);
@@ -1150,6 +1152,15 @@ export default function AIAgent() {
     });
   };
 
+  // Handles the "ecosystem-project" flow.
+  const handleEcosystemProjectSubmit = async (currentInput: string) => {
+    return await fetch("/api/ecosystem-projects", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: currentInput }),
+    });
+  };
+
   interface AbiMethod {
     name: string;
     args: { name: string; type: string }[];
@@ -1555,6 +1566,9 @@ const ${name} = async (${paramNames}) => {
         case "algorand-helper":
           response = await handleAlgorandHelperSubmit(currentInput, setMessages);
           break;
+        case "ecosystem-project":
+          response = await handleEcosystemProjectSubmit(currentInput);
+          break;
         case "general":
           response = await handleGeneralSubmit(currentInput);
           break;
@@ -1627,11 +1641,16 @@ const ${name} = async (${paramNames}) => {
         />
       ),
     },
+    {
+      id: "ecosystem-project",
+      label: "Ecosystem Projects",
+      icon: <Network size={20} />,
+    },
   ];
 
   const visibleTabs = activeAddress
     ? tabs
-    : tabs.filter((tab) => tab.id === "general");
+    : tabs.filter((tab) => tab.id === "general" || tab.id === "ecosystem-project");
 
 
 
@@ -1713,9 +1732,8 @@ const ${name} = async (${paramNames}) => {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col bg-gradient-to-b from-black/60 to-gray-900/10 backdrop-blur-md">
-        {messages.length === 0 && !(activeTab === "algorand-helper") ? (
+        {messages.length === 0 && !(activeTab === "algorand-helper") && !(activeTab === "ecosystem-project") ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8">
             <div className="rounded-full bg-gray-500/10 p-6 mb-6">
               <Image
@@ -1776,6 +1794,40 @@ const ${name} = async (${paramNames}) => {
                   "List of all Supported RPC's with URL",
                   "List of all Supported Indexers",
                   "List of all Supported Oracles",
+                ].map((suggestion, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      setUserInput(suggestion);
+                    }}
+                    className="bg-gray-500/10 whitespace-nowrap hover:bg-gray-500/20 text-gray-200 p-4 rounded-xl border border-gray-500/10 text-left transition-all duration-200 hover:border-gray-500/30"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
+        ) : messages.length === 0 && activeTab === "ecosystem-project" ? (
+          <>
+            <div className="flex-1 flex flex-col items-center justify-center p-8">
+              <div className="rounded-full bg-gray-500/10 mb-6 flex items-center justify-center">
+                <Network className="text-gray-400 w-20 h-20" size={80} />
+              </div>
+              <h2 className="text-2xl text-gray-100 mb-3 font-bold">
+                Algorand Ecosystem Projects
+              </h2>
+              <p className="text-center max-w-md mb-8 text-yellow-400">
+                Discover and learn about projects in the Algorand ecosystem. Ask about wallets, DEXs, SDKs, tools, and more!
+              </p>
+              <div className="grid grid-cols-2 gap-4 w-full max-w-3xl">
+                {[
+                  "List all wallets in the ecosystem",
+                  "Show me DEX projects on Algorand",
+                  "What SDKs are available for Algorand?",
+                  "List all block explorers",
+                  "Show projects with GitHub repositories",
+                  "What are the best DeFi projects?",
                 ].map((suggestion, idx) => (
                   <button
                     key={idx}
@@ -1879,7 +1931,9 @@ const ${name} = async (${paramNames}) => {
                                 ? "e.g., 'Transfer Your Tokens From One Chain to Other Chain'"
                                 : activeTab === "algorand-helper"
                                   ? "e.g., 'Ask Anything You Want From Algorand Ecosystem :  Oracles , RPC's , Contracts etc'"
-                                  : activeTab === "mint-token"
+                                  : activeTab === "ecosystem-project"
+                                    ? "e.g., 'List all wallets in the ecosystem'"
+                                    : activeTab === "mint-token"
                                     ? "e.g., 'Mint your personalized tokens in single prompt'" : activeTab === "get-quotes"
                                       ? "e.g., 'Get any token quotes by just ticker'" : activeTab === "transfer-token"
                                         ? "e.g., 'Transfer Tokens to Receiver Just By Communication'" : activeTab === "transfer-native-token"
@@ -1904,7 +1958,7 @@ const ${name} = async (${paramNames}) => {
               type="submit"
               disabled={
                 loading ||
-                (!activeAddress && activeTab !== "general") ||
+                (!activeAddress && activeTab !== "general" && activeTab !== "ecosystem-project") ||
                 !userInput.trim()
               }
               className="bg-gradient-to-r from-gray-500 to-white hover:from-gray-600 hover:to-gray-400 disabled:from-gray-600 disabled:to-gray-700 text-white p-4 rounded-xl flex items-center justify-center transition-all duration-300 hover:shadow-lg hover:shadow-gray-500/20 disabled:shadow-none h-12 w-12 mb-2"
