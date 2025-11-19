@@ -3,6 +3,13 @@
 "use client";
 import React, { useState, KeyboardEvent } from "react";
 import * as algokit from '@algorandfoundation/algokit-utils';
+import algosdk from "algosdk";
+import NFDRegistryAbi from "@/utils/NFD Registry arc32.json";
+type MintResult = {
+  txId: string;
+  confirmedRound: number | null;
+  returnedAppId?: bigint | null; // if contract returns the new NFD app id (may be available in logs/return)
+};
 
 import {
   accountabstraction,
@@ -69,6 +76,121 @@ export default function AIAgent() {
     activeAddress,
     transactionSigner
   } = useWallet();
+  
+  const mintNfdName = async (
+    nfdName: string,
+    reservedFor: string,           // address to own the NFD after mint
+    linkOnMint: boolean,           // should the registry auto-link the address on mint
+    priceMicroAlgos: bigint,       // price for the name (microAlgos)
+    carryMicroAlgos: bigint,       // extra MBR / carry cost (microAlgos)
+    registryAppId: number,         // registry application id
+    registryAddress: string        // registry account address (to receive payment)
+  ) => {
+    try {
+      if (!activeAddress) throw new Error("[App] No active account");
+      
+      const algorand = algokit.AlgorandClient.testNet();
+      algorand.setDefaultSigner(transactionSigner);
+
+      const registryAbi: any = NFDRegistryAbi;
+      if (!registryAbi) {
+        throw new Error("Registry ABI not found. Please ensure NFD Registry arc32.json is properly imported.");
+      }
+  
+      // find mintNfd method object
+      const mintMethod = registryAbi.methods?.find((m: any) => m.name === "mintNfd");
+      if (!mintMethod) throw new Error("mintNfd method not found in registry ABI.");
+  
+      // Prepare suggested params
+      // const algodClient = algorand.algodClient; // algokit client exposes raw algod — adapt if different
+      // const suggestedParams = await algodClient.getTransactionParams().do();
+  
+      // // 1) Build Payment txn (buyer -> registry address)
+      // const totalPayment = BigInt(priceMicroAlgos) + BigInt(carryMicroAlgos); // microAlgos
+      // const paymentTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+      //   from: activeAddress,
+      //   to: registryAddress,
+      //   amount: Number(totalPayment), // algosdk expects number; ensure it fits JS number. For >53-bit use raw signing.
+      //   suggestedParams,
+      // });
+  
+      // // 2) Encode ABI method call
+      // // algosdk's encodeMethodCall requires a Method object — easiest is to construct the object manually.
+      // // We'll convert the ABI method to algosdk Method instance:
+      // const method = new algosdk.Method({
+      //   name: mintMethod.name,
+      //   args: mintMethod.args.map((a: any) => ({ name: a.name, type: a.type })),
+      //   returns: mintMethod.returns ? { type: mintMethod.returns.type } : undefined,
+      // });
+  
+      // // The mintNfd ABI expects the `purchaseTxn` as type "pay" (a payment txn object in the group)
+      // // For ABI encoding we pass a placeholder for purchaseTxn: with algosdk.encodeMethodCall the ABI encoder
+      // // will expect the group index to contain the payment transaction at the right position automatically.
+      // // algosdk.encodeMethodCall supports 'txns' as part of the encoded params — we will provide purchase txn as
+      // // a special argument using the `txn` ABI type. The helper below uses algosdk.encodeUnsignedTransaction for that.
+      // //
+      // // Build the encoded call via algosdk:
+      // const abiEncode = algosdk.encodeMethodCall({
+      //   method,
+      //   // method args must match ABI order: [purchaseTxn(pay), nfdName(string), reservedFor(address), linkOnMint(bool)]
+      //   methodArgs: [
+      //     // For a 'pay' arg, we must pass the actual payment transaction as a SignedTxn? In practice with algosdk,
+      //     // encodeMethodCall supports passing a Transaction object to be placed into the group as a "txn" arg.
+      //     // We'll pass the paymentTxn object; algosdk will return `appArgs`, `accounts`, `foreignApps`, `foreignAssets`, and `txns` placeholders.
+      //     paymentTxn,
+      //     nfdName,
+      //     reservedFor,
+      //     linkOnMint,
+      //   ],
+      //   sender: activeAddress,
+      // });
+  
+      // // 3) Create the application call transaction (NoOp) with the encoded ABI call data
+      // const appCallTxn = algosdk.makeApplicationCallTxnFromObject({
+      //   from: activeAddress,
+      //   appIndex: registryAppId,
+      //   appArgs: abiEncode.appArgs,          // raw method selector + args
+      //   accounts: abiEncode.accounts || [],
+      //   foreignApps: abiEncode.foreignApps || [],
+      //   foreignAssets: abiEncode.foreignAssets || [],
+      //   suggestedParams,
+      // });
+  
+      // // 4) Group them: IMPORTANT: payment must come BEFORE the appCall (index order)
+      // const txns = [paymentTxn, appCallTxn];
+      // const groupId = algosdk.computeGroupID(txns as unknown as algosdk.Transaction[]); // compute group id
+      // for (let t of txns) (t as any).group = groupId;
+  
+      // // 5) Sign transactions (use algokit transactionSigner like in your other helpers)
+      // // If your transactionSigner is set as the default signer in algorand client,
+      // // you can use algorand.signTransaction? But to match your other functions, we sign locally:
+      // const signedPayment = await transactionSigner(activeAddress, paymentTxn.toByte()); // adapt to your signer API
+      // const signedAppCall = await transactionSigner(activeAddress, appCallTxn.toByte()); // adapt
+  
+      // // If transactionSigner returns raw signed tx bytes, use them directly; else adjust as needed.
+      // const signedTxns = [signedPayment, signedAppCall];
+  
+      // // 6) Submit
+      // const { txId } = await algodClient.sendRawTransaction(signedTxns).do();
+  
+      // // 7) Wait for confirmation
+      // const confirmed = await algorand.waitForConfirmation(txId, 4); // helper on algokit client — adapt as needed
+  
+      // // Optionally parse returned value (if contract returns the new NFD app id)
+      // // The contract returns a uint64 on success — you may find it in the application call return or logs.
+      // // Parsing return value is a bit involved — for now we'll return txId + confirmed round.
+      // return {
+      //   txId,
+      //   confirmedRound: confirmed?.confirmedRound ?? null,
+      //   returnedAppId: null,
+      // };
+
+    } catch (err) {
+      console.error("❌ Error minting NFD:", err);
+      throw err;
+    }
+  };
+
 
   const createFungibleTokens = async (
     unitName: string,
@@ -112,6 +234,9 @@ export default function AIAgent() {
       throw err;
     }
   };
+
+
+
 
 
   const algoDirectPayment = async (receiver: string, amount: number) => {
@@ -228,9 +353,6 @@ export default function AIAgent() {
     }
   };
 
-
-
-
   const createNFT = async (url: string, name: string) => {
     try {
 
@@ -330,10 +452,13 @@ export default function AIAgent() {
   } | null>(null);
 
   const [pendingNFDLookup, setPendingNFDLookup] = useState<{
-    step: "address" | "view" | "confirm";
+    step: "address" | "view" | "confirm" | "name" | "reservedFor" | "linkOnMint";
     address?: string;
     view?: string;
-    operation?: "getAllNfds" | "reverseLookup" | "resolveName";
+    operation?: "getAllNfds" | "reverseLookup" | "resolveName" | "mintNfd";
+    nfdName?: string;
+    reservedFor?: string;
+    linkOnMint?: boolean;
   } | null>(null);
 
   const [swapState, setSwapState] = useState<SwapState>({
@@ -1202,6 +1327,36 @@ export default function AIAgent() {
     const wantsReverseLookup = lowerInput.includes('reverse') && 
                                 (lowerInput.includes('lookup') || lowerInput.includes('look up'));
     
+    // Check if user wants to mint an NFD
+    const wantsMintNfd = lowerInput.includes('mint') && 
+                         (lowerInput.includes('nfd') || lowerInput.includes('name'));
+    
+    // If user wants to mint NFD and we don't have pending state, start the flow
+    if (wantsMintNfd && !pendingNFDLookup) {
+      if (!activeAddress) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: "❌ Please connect your wallet first to mint an NFD name.",
+          },
+        ]);
+        setLoading(false);
+        return null;
+      }
+      
+      setPendingNFDLookup({ step: "name", operation: "mintNfd" });
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Sure! Let's mint an NFD name. What name would you like to mint? (e.g., 'myname.algo')",
+        },
+      ]);
+      setLoading(false);
+      return null;
+    }
+    
     // If user wants "Get all NFDs" and we don't have pending state, start the flow
     if (wantsAllNfds && !pendingNFDLookup) {
       setPendingNFDLookup({ step: "address", operation: "getAllNfds" });
@@ -1246,71 +1401,198 @@ export default function AIAgent() {
 
     // If we're in the flow, handle step by step
     if (pendingNFDLookup) {
-      // Step 1: Collect address
-      if (pendingNFDLookup.step === "address") {
-        if (addressPattern.test(input) || addressPattern58.test(input)) {
-          // For reverseLookup, we can directly call the API without asking for view type
-          if (pendingNFDLookup.operation === "reverseLookup") {
+      // Mint NFD flow
+      if (pendingNFDLookup.operation === "mintNfd") {
+        // Step 1: Collect NFD name
+        if (pendingNFDLookup.step === "name") {
+          const nfdName = input.trim();
+          if (nfdName.length === 0) {
             setMessages((prev) => [
               ...prev,
               {
                 role: "assistant",
-                content: `Got it! Resolving address: \`${input}\`. Fetching now...`,
-              },
-            ]);
-
-            // Make the API call with reverseLookup operation
-            try {
-              const response = await fetch("/api/nfd-names", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                  text: input,
-                  operation: "reverseLookup",
-                  view: "brief"
-                }),
-              });
-
-              const data = await response.json();
-              
-              if (data.error) {
-                setMessages((prev) => [
-                  ...prev,
-                  { role: "assistant", content: `❌ Error: ${data.error}` },
-                ]);
-              } else {
-                const formattedContent = formatNFDResponse(data);
-                setMessages((prev) => [
-                  ...prev,
-                  { role: "assistant", content: formattedContent },
-                ]);
-              }
-              
-              // Reset the flow
-              setPendingNFDLookup(null);
-            } catch (error) {
-              setMessages((prev) => [
-                ...prev,
-                { role: "assistant", content: "❌ Failed to fetch NFD data. Please try again." },
-              ]);
-              setPendingNFDLookup(null);
-            }
-            
-            setLoading(false);
-            return null;
-          } else {
-            // For getAllNfds, ask for view type
-            setPendingNFDLookup({ step: "view", address: input, operation: pendingNFDLookup.operation });
-            setMessages((prev) => [
-              ...prev,
-              {
-                role: "assistant",
-                content: `Got it! Address: \`${input}\`\n\nWhat view type would you like? (Options: **tiny**, **thumbnail**, **brief**, **full** - or just press enter for default "brief")`,
+                content: "❌ Please provide a valid NFD name.",
               },
             ]);
             setLoading(false);
             return null;
           }
+          
+          setPendingNFDLookup({ 
+            step: "reservedFor", 
+            operation: "mintNfd",
+            nfdName: nfdName
+          });
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "assistant",
+              content: `Got it! NFD name: \`${nfdName}\`\n\nWhich address should own this NFD? (Press enter to use your connected address: \`${activeAddress}\`)`,
+            },
+          ]);
+          setLoading(false);
+          return null;
+        }
+        
+        // Step 2: Collect reserved for address
+        if (pendingNFDLookup.step === "reservedFor") {
+          const inputAddress = input.trim();
+          const reservedFor = inputAddress || activeAddress || '';
+          const addressPattern = /^[A-Z2-7]{57}[AEIMQUY4]$/i;
+          const addressPattern58 = /^[A-Z2-7]{58}$/i;
+          
+          // If user provided an address, validate it
+          if (inputAddress && !addressPattern.test(inputAddress) && !addressPattern58.test(inputAddress)) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: "assistant",
+                content: "❌ That doesn't look like a valid Algorand address. Please provide a valid 58-character Algorand address, or press enter to use your connected address.",
+              },
+            ]);
+            setLoading(false);
+            return null;
+          }
+          
+          setPendingNFDLookup({ 
+            step: "linkOnMint", 
+            operation: "mintNfd",
+            nfdName: pendingNFDLookup.nfdName,
+            reservedFor: reservedFor
+          });
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "assistant",
+              content: `Perfect! Reserved for: \`${reservedFor}\`\n\nShould the registry auto-link this address to the NFD on mint? (yes/no, default: yes)`,
+            },
+          ]);
+          setLoading(false);
+          return null;
+        }
+        
+        // Step 3: Collect link on mint preference
+        if (pendingNFDLookup.step === "linkOnMint") {
+          const linkOnMintInput = lowerInput.trim();
+          const linkOnMint = linkOnMintInput === '' || linkOnMintInput === 'yes' || linkOnMintInput === 'y' || linkOnMintInput === 'true';
+          
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "assistant",
+              content: `Great! I'll mint the NFD name \`${pendingNFDLookup.nfdName}\` for address \`${pendingNFDLookup.reservedFor}\` with link on mint: ${linkOnMint}.\n\n⚠️ Note: This will require price and carry costs. Fetching pricing information...`,
+            },
+          ]);
+          
+          // Call mintNfdName function
+          try {
+            // For now, using placeholder values - you may want to fetch these from the registry
+            // You might need to call getPrice() method from the registry contract
+            const registryAppId = 763844423; // Testnet registry app ID - you may want to make this configurable
+            const registryAddress = "RSV2YCHXA7MWGFTX3WYI7TVGAS5W5XH5M7ZQVXPPRQ7DNTNW36OW2TRR6I"; // Testnet registry address - you may want to make this configurable
+            const priceMicroAlgos = BigInt(1000000); // 1 ALGO in microAlgos - should be fetched from registry
+            const carryMicroAlgos = BigInt(100000); // 0.1 ALGO - should be calculated based on MBR
+            
+            await mintNfdName(
+              pendingNFDLookup.nfdName || '',
+              pendingNFDLookup.reservedFor || activeAddress || '',
+              linkOnMint,
+              priceMicroAlgos,
+              carryMicroAlgos,
+              registryAppId,
+              registryAddress
+            );
+            
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: "assistant",
+                content: `✅ NFD name \`${pendingNFDLookup.nfdName}\` minting initiated! The transaction is being processed.`,
+              },
+            ]);
+          } catch (error: any) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: "assistant",
+                content: `❌ Error minting NFD: ${error.message || 'Failed to mint NFD. Please try again.'}`,
+              },
+            ]);
+          }
+          
+          // Reset the flow
+          setPendingNFDLookup(null);
+          setLoading(false);
+          return null;
+        }
+      }
+      
+      // Step 1: Collect address or name (for other operations)
+      if (pendingNFDLookup.step === "address") {
+        // For reverseLookup, user provides a name (not an address)
+        if (pendingNFDLookup.operation === "reverseLookup") {
+          // Accept any input as a name (not validating as address)
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "assistant",
+              content: `Got it! Looking up address for NFD name: \`${input}\`. Fetching now...`,
+            },
+          ]);
+
+          // Make the API call with resolveName operation (name to address)
+          try {
+            const response = await fetch("/api/nfd-names", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ 
+                text: input,
+                operation: "resolveName",
+                view: "brief"
+              }),
+            });
+
+            const data = await response.json();
+            
+            if (data.error) {
+              setMessages((prev) => [
+                ...prev,
+                { role: "assistant", content: `❌ Error: ${data.error}` },
+              ]);
+            } else {
+              const formattedContent = formatNFDResponse(data);
+              setMessages((prev) => [
+                ...prev,
+                { role: "assistant", content: formattedContent },
+              ]);
+            }
+            
+            // Reset the flow
+            setPendingNFDLookup(null);
+          } catch (error) {
+            setMessages((prev) => [
+              ...prev,
+              { role: "assistant", content: "❌ Failed to fetch NFD data. Please try again." },
+            ]);
+            setPendingNFDLookup(null);
+          }
+          
+          setLoading(false);
+          return null;
+        } 
+        // For getAllNfds, validate address
+        else if (addressPattern.test(input) || addressPattern58.test(input)) {
+          // For getAllNfds, ask for view type
+          setPendingNFDLookup({ step: "view", address: input, operation: pendingNFDLookup.operation });
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "assistant",
+              content: `Got it! Address: \`${input}\`\n\nWhat view type would you like? (Options: **tiny**, **thumbnail**, **brief**, **full** - or just press enter for default "brief")`,
+            },
+          ]);
+          setLoading(false);
+          return null;
         } else {
           setMessages((prev) => [
             ...prev,
@@ -1442,11 +1724,24 @@ export default function AIAgent() {
       
       let card = `<div style="${cardStyle}">`;
       
-      // Card header with name
+      // Card header with name and avatar
       if (nfd.name) {
         card += `<div style="${nameStyle}">
           <span style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 0.25rem 0.75rem; border-radius: 0.5rem; font-size: 0.875rem; color: white;">${index !== undefined ? `#${index + 1}` : 'NFD'}</span>
           <span>${nfd.name}</span>
+        </div>`;
+      }
+      
+      // Display avatar if available
+      const avatarUrl = nfd.avatar || (nfd.properties && nfd.properties.avatar) || (nfd.properties && nfd.properties.userDefined && nfd.properties.userDefined.avatar);
+      if (avatarUrl && typeof avatarUrl === 'string' && avatarUrl.trim() !== '') {
+        card += `<div style="margin-bottom: 1rem; display: flex; justify-content: center;">
+          <img 
+            src="${avatarUrl}" 
+            alt="NFD Avatar" 
+            style="width: 120px; height: 120px; border-radius: 1rem; object-fit: cover; border: 2px solid rgba(99, 102, 241, 0.3); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);"
+            onerror="this.style.display='none'"
+          />
         </div>`;
       }
       
@@ -1534,7 +1829,7 @@ export default function AIAgent() {
       }
       
       // Helper function to render nested properties
-      const renderPropertyValue = (value: any, depth: number = 0): string => {
+      const renderPropertyValue = (value: any, depth: number = 0, key?: string): string => {
         if (value === null || value === undefined) {
           return '<span style="color: #6b7280;">null</span>';
         }
@@ -1546,7 +1841,7 @@ export default function AIAgent() {
           let html = '<div style="margin-left: 1rem;">';
           value.forEach((item, idx) => {
             html += `<div style="margin-bottom: 0.25rem;">
-              <span style="color: #9ca3af;">[${idx}]:</span> ${renderPropertyValue(item, depth + 1)}
+              <span style="color: #9ca3af;">[${idx}]:</span> ${renderPropertyValue(item, depth + 1, undefined)}
             </div>`;
           });
           html += '</div>';
@@ -1559,10 +1854,10 @@ export default function AIAgent() {
             return '<span style="color: #6b7280;">{}</span>';
           }
           let html = '<div style="margin-left: 1rem; border-left: 2px solid rgba(99, 102, 241, 0.3); padding-left: 0.75rem;">';
-          keys.forEach((key) => {
+          keys.forEach((k) => {
             html += `<div style="margin-bottom: 0.5rem;">
-              <span style="color: #a78bfa; font-weight: 600; font-size: 0.75rem;">${key}:</span>
-              <div style="margin-top: 0.25rem;">${renderPropertyValue(value[key], depth + 1)}</div>
+              <span style="color: #a78bfa; font-weight: 600; font-size: 0.75rem;">${k}:</span>
+              <div style="margin-top: 0.25rem;">${renderPropertyValue(value[k], depth + 1, k)}</div>
             </div>`;
           });
           html += '</div>';
@@ -1571,6 +1866,21 @@ export default function AIAgent() {
         
         // Primitive values
         if (typeof value === 'string') {
+          // Check if it's an avatar field or image URL
+          const isAvatarField = key && key.toLowerCase() === 'avatar';
+          const isImageUrl = /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(value) || 
+                           (value.startsWith('http') && (value.includes('avatar') || value.includes('image')));
+          
+          // If it's an avatar field or looks like an image URL, display as image
+          if ((isAvatarField || isImageUrl) && value.startsWith('http')) {
+            return `<img 
+              src="${value}" 
+              alt="${key || 'Image'}" 
+              style="max-width: 200px; max-height: 200px; border-radius: 0.5rem; object-fit: cover; border: 1px solid rgba(99, 102, 241, 0.3); margin-top: 0.5rem;"
+              onerror="this.style.display='none'"
+            />`;
+          }
+          
           return `<span style="color: #e5e7eb;">${value}</span>`;
         }
         if (typeof value === 'number' || typeof value === 'boolean') {
@@ -1586,10 +1896,30 @@ export default function AIAgent() {
           <div style="background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 0.5rem; padding: 1rem; margin-top: 0.75rem;">`;
         
         Object.entries(nfd.properties).forEach(([key, value]: [string, any]) => {
+          // Skip avatar in properties since we already display it at the top
+          if (key.toLowerCase() === 'avatar') {
+            return;
+          }
+          
+          // Skip userDefined.avatar if it exists (we already display it at the top)
+          if (key.toLowerCase() === 'userdefined' && value && typeof value === 'object' && value.avatar) {
+            // Render userDefined but without the avatar field
+            const { avatar, ...restUserDefined } = value;
+            if (Object.keys(restUserDefined).length > 0) {
+              card += `<div style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(107, 114, 128, 0.1);">
+                <div style="color: #a78bfa; font-weight: 700; font-size: 0.875rem; margin-bottom: 0.5rem; text-transform: capitalize;">${key}</div>
+                <div style="color: #e5e7eb; font-size: 0.875rem;">
+                  ${renderPropertyValue(restUserDefined, 0, key)}
+                </div>
+              </div>`;
+            }
+            return;
+          }
+          
           card += `<div style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(107, 114, 128, 0.1);">
             <div style="color: #a78bfa; font-weight: 700; font-size: 0.875rem; margin-bottom: 0.5rem; text-transform: capitalize;">${key}</div>
             <div style="color: #e5e7eb; font-size: 0.875rem;">
-              ${renderPropertyValue(value)}
+              ${renderPropertyValue(value, 0, key)}
             </div>
           </div>`;
         });
@@ -2359,13 +2689,14 @@ const ${name} = async (${paramNames}) => {
                 Algorand NFD Names
               </h2>
               <p className="text-center max-w-md mb-8 text-yellow-400">
-                Look up Algorand NameFi Domains (NFD) names and addresses. Three operations available: resolve name to address, reverse lookup address to names, or get all NFDs for an address.
+                Look up Algorand NameFi Domains (NFD) names and addresses. Four operations available: resolve name to address, reverse lookup address to names, get all NFDs for an address, or mint a new NFD name.
               </p>
               <div className="grid grid-cols-2 gap-4 w-full max-w-4xl">
                 {[
                   "Resolve NFD name to address",
                   "Reverse lookup: Address to NFD names",
                   "Get all NFDs for an address",
+                  "Mint NFD name",
                 ].map((suggestion, idx) => (
                   <button
                     key={idx}
