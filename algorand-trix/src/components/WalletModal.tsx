@@ -18,9 +18,18 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
         }
       }, [isOpen]);
 
+  const handleOpenChange = (open: boolean) => {
+    console.log('Dialog onOpenChange:', open);
+    // onOpenChange receives a boolean, but onClose expects no params
+    // So we call onClose when dialog is being closed (open === false)
+    if (!open) {
+      onClose();
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg" >{children}</DialogContent>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent className="max-w-lg z-[100]" >{children}</DialogContent>
     </Dialog>
   )
 }

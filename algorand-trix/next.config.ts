@@ -10,6 +10,36 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true, // Skip ESLint checks during builds
   },
+  webpack: (config, { isServer }) => {
+    // Handle lute-connect module loading issues
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
+    
+    // Optimize chunk splitting for wallet libraries
+    config.optimization = {
+      ...config.optimization,
+      splitChunks: {
+        ...config.optimization.splitChunks,
+        cacheGroups: {
+          ...config.optimization.splitChunks?.cacheGroups,
+          wallet: {
+            test: /[\\/]node_modules[\\/](lute-connect|@perawallet|@blockshake)[\\/]/,
+            name: 'wallet-libs',
+            chunks: 'all',
+            priority: 10,
+          },
+        },
+      },
+    };
+    
+    return config;
+  },
 };
 
 export default nextConfig;

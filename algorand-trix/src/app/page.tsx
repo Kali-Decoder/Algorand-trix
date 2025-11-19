@@ -21,7 +21,9 @@ const walletManager = new WalletManager({
     WalletId.KIBISIS,
     {
       id: WalletId.LUTE,
-      options: { siteName: 'http://localhost:3000/' }
+      options: { 
+        siteName: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
+      }
     },
     {
       id: WalletId.MAGIC,

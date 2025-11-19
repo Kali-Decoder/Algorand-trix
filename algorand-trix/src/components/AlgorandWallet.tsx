@@ -9,11 +9,20 @@ export function Connect() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [balance, setBalance] = useState<number | null>(null);
 
-  const handleConnect = () => setIsModalOpen(true);
+  const handleConnect = () => {
+    console.log('Connect button clicked, opening modal...');
+    console.log('Available wallets:', wallets);
+    setIsModalOpen(true);
+  };
 
   const handleDisconnect = () => {
     const activeWallet = wallets.find((wallet) => wallet.isConnected);
     if (activeWallet) activeWallet.disconnect();
+  };
+
+  const handleModalClose = () => {
+    console.log('Modal close requested');
+    setIsModalOpen(false);
   };
 
   useEffect(() => {
@@ -81,7 +90,7 @@ export function Connect() {
       )}
 
       {/* Wallet Select Modal */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+      <Modal isOpen={isModalOpen} onClose={handleModalClose}>
         <WalletList onClose={() => setIsModalOpen(false)} />
       </Modal>
     </>
@@ -90,32 +99,207 @@ export function Connect() {
 
 function WalletList({ onClose }: { onClose: () => void }) {
   const { wallets } = useWallet();
+  const [connecting, setConnecting] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleConnect = async (wallet: Wallet) => {
-    await wallet.connect();
-    onClose();
+    try {
+      setConnecting(wallet.id);
+      setError(null);
+      
+      console.log('Connecting to wallet:', wallet.metadata.name);
+      console.log('Wallet object:', wallet);
+      console.log('Wallet ID:', wallet.id);
+      console.log('Wallet connected:', wallet.isConnected);
+      
+      // For Lute wallet, add special handling for chunk loading errors
+      if (wallet.id === 'lute') {
+        try {
+          // Try to connect with a timeout
+          const connectPromise = wallet.connect();
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Connection timeout. Please try again.')), 10000)
+          );
+          
+          const result = await Promise.race([connectPromise, timeoutPromise]);
+          console.log('Wallet connect result:', result);
+        } catch (luteError: any) {
+          // If it's a chunk loading error, provide helpful message
+          if (luteError?.message?.includes('chunk') || luteError?.message?.includes('Failed to load')) {
+            throw new Error('Lute wallet connection failed. Please refresh the page and try again. If the issue persists, try clearing your browser cache.');
+          }
+          throw luteError;
+        }
+      } else {
+        // Connect to other wallets normally
+        const result = await wallet.connect();
+        console.log('Wallet connect result:', result);
+      }
+      
+      console.log('Wallet connected successfully');
+      
+      // Close modal after successful connection
+      setTimeout(() => {
+        onClose();
+        setConnecting(null);
+      }, 500);
+    } catch (error: any) {
+      console.error('Error connecting wallet:', error);
+      const errorMessage = error?.message || `Failed to connect to ${wallet.metadata.name}. Please try again.`;
+      setError(errorMessage);
+      setConnecting(null);
+    }
   };
 
+  if (wallets.length === 0) {
+    return (
+      <div className="p-6">
+        <div className="text-center">
+          <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+            <svg
+              className="w-8 h-8 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              />
+            </svg>
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">
+            No Wallets Found
+          </h2>
+          <p className="text-sm text-gray-500">
+            Please install a wallet extension like Lute or Pera Wallet to continue.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-4">
-      <h2 className="text-lg font-bold mb-4 text-center">
-        Connect Your Wallet
-      </h2>
-      <div className="space-y-3">
-        {wallets.map((wallet) => (
-          <button
-            key={wallet.id}
-            onClick={() => handleConnect(wallet)}
-            className="flex w-full items-center justify-between px-4 py-2 border rounded-lg hover:bg-gray-100 transition"
-          >
-            <span className="font-medium">{wallet.metadata.name}</span>
-            <img
-              src={wallet.metadata.icon}
-              alt="wallet icon"
-              className="w-6 h-6"
-            />
-          </button>
-        ))}
+    <div className="p-6">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">
+          Connect Your Wallet
+        </h2>
+        <p className="text-sm text-gray-500 text-center">
+          Choose a wallet to connect to Algorand
+        </p>
+      </div>
+      
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex items-start gap-3">
+            <svg
+              className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <p className="text-sm text-red-700">{error}</p>
+          </div>
+        </div>
+      )}
+      
+      <div className="grid grid-cols-3 gap-4">
+        {wallets.map((wallet) => {
+          const isConnecting = connecting === wallet.id;
+          const isConnected = wallet.isConnected;
+          
+          return (
+            <button
+              key={wallet.id}
+              onClick={() => handleConnect(wallet)}
+              disabled={isConnecting || isConnected}
+              className={`
+                group relative flex flex-col items-center justify-center gap-3 p-4 
+                border-2 rounded-xl transition-all duration-200
+                ${
+                  isConnecting
+                    ? 'border-blue-300 bg-blue-50 cursor-wait'
+                    : isConnected
+                      ? 'border-green-300 bg-green-50 cursor-default'
+                      : 'border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50 hover:shadow-md cursor-pointer'
+                }
+                disabled:opacity-75 disabled:cursor-not-allowed
+              `}
+            >
+              {/* Wallet Icon */}
+              <div className={`
+                w-16 h-16 rounded-lg flex items-center justify-center
+                transition-all duration-200
+                ${
+                  isConnecting
+                    ? 'bg-blue-100'
+                    : isConnected
+                      ? 'bg-green-100'
+                      : 'bg-gray-100 group-hover:bg-blue-100'
+                }
+              `}>
+                <img
+                  src={wallet.metadata.icon}
+                  alt={wallet.metadata.name}
+                  className="w-12 h-12 object-contain"
+                  onError={(e) => {
+                    // Fallback icon if image fails to load
+                    e.currentTarget.style.display = 'none';
+                    const parent = e.currentTarget.parentElement;
+                    if (parent) {
+                      parent.innerHTML = `
+                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                      `;
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Wallet Name */}
+              <div className="flex flex-col items-center gap-1 w-full">
+                <h3 className="font-semibold text-gray-900 text-xs text-center">
+                  {wallet.metadata.name}
+                </h3>
+                {isConnected && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 rounded-full">
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    Connected
+                  </span>
+                )}
+                {isConnecting && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 rounded-full">
+                    <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Connecting...
+                  </span>
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Footer Info */}
+      <div className="mt-6 pt-4 border-t border-gray-200">
+        <p className="text-xs text-gray-500 text-center">
+          By connecting, you agree to the terms of service and privacy policy
+        </p>
       </div>
     </div>
   );
