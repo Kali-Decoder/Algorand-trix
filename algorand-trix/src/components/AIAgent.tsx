@@ -31,6 +31,7 @@ import {
   ArrowUpDown,
   ArrowBigUp,
   Network,
+  Tag,
 } from "lucide-react";
 
 import ResponseDisplay from "./ResponseDisplay";
@@ -57,7 +58,8 @@ type TabType =
   | "cross-chain"
   | "generate"
   | "algorand-helper"
-  | "ecosystem-project";
+  | "ecosystem-project"
+  | "nfd-names";
 
 export default function AIAgent() {
 
@@ -327,6 +329,13 @@ export default function AIAgent() {
     amount?: string;
   } | null>(null);
 
+  const [pendingNFDLookup, setPendingNFDLookup] = useState<{
+    step: "address" | "view" | "confirm";
+    address?: string;
+    view?: string;
+    operation?: "getAllNfds" | "reverseLookup" | "resolveName";
+  } | null>(null);
+
   const [swapState, setSwapState] = useState<SwapState>({
     action: null,
     tokenId: "",
@@ -380,7 +389,7 @@ export default function AIAgent() {
 
 
   React.useEffect(() => {
-    if (!activeAddress && activeTab !== "general" && activeTab !== "ecosystem-project") {
+    if (!activeAddress && activeTab !== "general" && activeTab !== "ecosystem-project" && activeTab !== "nfd-names") {
       setActiveTab("general");
     }
   }, [activeAddress, activeTab]);
@@ -1161,6 +1170,478 @@ export default function AIAgent() {
     });
   };
 
+  // Handles the "nfd-names" flow.
+  const handleNFDNamesSubmit = async (
+    currentInput: string,
+    setMessages: (fn: (prev: any[]) => any[]) => void
+  ) => {
+    console.log("currentInput", currentInput);
+    const lowerInput = currentInput.toLowerCase().trim();
+    const input = currentInput.trim();
+    
+    // Determine operation type based on input
+    type OperationType = "getAllNfds" | "resolveName" | "reverseLookup" | null;
+    let operationType: OperationType = null;
+    
+    // Check if user wants to get all NFDs
+    const wantsAllNfds = lowerInput.includes('get all') || 
+                         lowerInput.includes('all nfd') ||
+                         lowerInput.includes('all nfds') ||
+                         lowerInput.includes('show all nfd');
+
+    // Address patterns
+    const addressPattern = /^[A-Z2-7]{57}[AEIMQUY4]$/i;
+    const addressPattern58 = /^[A-Z2-7]{58}$/i;
+    
+
+    // Check if user wants to resolve an address (reverse lookup)
+    const wantsResolveAddress = lowerInput.includes('resolve') && 
+                                (lowerInput.includes('address') || lowerInput.includes('an address'));
+    
+    // Check if user wants reverse lookup
+    const wantsReverseLookup = lowerInput.includes('reverse') && 
+                                (lowerInput.includes('lookup') || lowerInput.includes('look up'));
+    
+    // If user wants "Get all NFDs" and we don't have pending state, start the flow
+    if (wantsAllNfds && !pendingNFDLookup) {
+      setPendingNFDLookup({ step: "address", operation: "getAllNfds" });
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Sure! Which address do you want all NFD names for? Please provide the Algorand address.",
+        },
+      ]);
+      setLoading(false);
+      return null;
+    }
+
+    // If user wants to resolve an address and we don't have pending state, start the flow
+    if (wantsResolveAddress && !pendingNFDLookup) {
+      setPendingNFDLookup({ step: "address", operation: "reverseLookup" });
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Sure! Tell me the address you want to resolve.",
+        },
+      ]);
+      setLoading(false);
+      return null;
+    }
+
+    // If user wants reverse lookup and we don't have pending state, start the flow
+    if (wantsReverseLookup && !pendingNFDLookup) {
+      setPendingNFDLookup({ step: "address", operation: "reverseLookup" });
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Sure! Tell me the name you want to reverse lookup.",
+        },
+      ]);
+      setLoading(false);
+      return null;
+    }
+
+    // If we're in the flow, handle step by step
+    if (pendingNFDLookup) {
+      // Step 1: Collect address
+      if (pendingNFDLookup.step === "address") {
+        if (addressPattern.test(input) || addressPattern58.test(input)) {
+          // For reverseLookup, we can directly call the API without asking for view type
+          if (pendingNFDLookup.operation === "reverseLookup") {
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: "assistant",
+                content: `Got it! Resolving address: \`${input}\`. Fetching now...`,
+              },
+            ]);
+
+            // Make the API call with reverseLookup operation
+            try {
+              const response = await fetch("/api/nfd-names", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                  text: input,
+                  operation: "reverseLookup",
+                  view: "brief"
+                }),
+              });
+
+              const data = await response.json();
+              
+              if (data.error) {
+                setMessages((prev) => [
+                  ...prev,
+                  { role: "assistant", content: `❌ Error: ${data.error}` },
+                ]);
+              } else {
+                const formattedContent = formatNFDResponse(data);
+                setMessages((prev) => [
+                  ...prev,
+                  { role: "assistant", content: formattedContent },
+                ]);
+              }
+              
+              // Reset the flow
+              setPendingNFDLookup(null);
+            } catch (error) {
+              setMessages((prev) => [
+                ...prev,
+                { role: "assistant", content: "❌ Failed to fetch NFD data. Please try again." },
+              ]);
+              setPendingNFDLookup(null);
+            }
+            
+            setLoading(false);
+            return null;
+          } else {
+            // For getAllNfds, ask for view type
+            setPendingNFDLookup({ step: "view", address: input, operation: pendingNFDLookup.operation });
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: "assistant",
+                content: `Got it! Address: \`${input}\`\n\nWhat view type would you like? (Options: **tiny**, **thumbnail**, **brief**, **full** - or just press enter for default "brief")`,
+              },
+            ]);
+            setLoading(false);
+            return null;
+          }
+        } else {
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "assistant",
+              content: "❌ That doesn't look like a valid Algorand address. Please provide a valid 58-character Algorand address.",
+            },
+          ]);
+          setLoading(false);
+          return null;
+        }
+      }
+
+      // Step 2: Collect view type (optional) - only for getAllNfds
+      if (pendingNFDLookup.step === "view") {
+        const viewTypes = ["tiny", "thumbnail", "brief", "full"];
+        const viewInput = input.toLowerCase();
+        const viewType = (viewInput && viewTypes.includes(viewInput)) ? viewInput : "brief";
+        
+        setPendingNFDLookup({ 
+          step: "confirm", 
+          address: pendingNFDLookup.address, 
+          view: viewType,
+          operation: pendingNFDLookup.operation
+        });
+        
+        const viewMessage = viewInput && viewTypes.includes(viewInput) 
+          ? `with view type **${viewType}**`
+          : `with default view type **brief**`;
+        
+        const operationMessage = pendingNFDLookup.operation === "getAllNfds"
+          ? `fetch all NFDs for address`
+          : `resolve address`;
+        
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: `Perfect! I'll ${operationMessage} \`${pendingNFDLookup.address}\` ${viewMessage}. Fetching now...`,
+          },
+        ]);
+
+        // Make the API call with explicit operation type
+        try {
+          const response = await fetch("/api/nfd-names", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+              text: pendingNFDLookup.address,
+              operation: pendingNFDLookup.operation || "getAllNfds",
+              view: viewType 
+            }),
+          });
+
+          const data = await response.json();
+          
+          if (data.error) {
+            setMessages((prev) => [
+              ...prev,
+              { role: "assistant", content: `❌ Error: ${data.error}` },
+            ]);
+          } else {
+            const formattedContent = formatNFDResponse(data);
+            setMessages((prev) => [
+              ...prev,
+              { role: "assistant", content: formattedContent },
+            ]);
+          }
+          
+          // Reset the flow
+          setPendingNFDLookup(null);
+        } catch (error) {
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: "❌ Failed to fetch NFD data. Please try again." },
+          ]);
+          setPendingNFDLookup(null);
+        }
+        
+        setLoading(false);
+        return null;
+      }
+    }
+
+    // Determine operation type based on keywords in the message
+    // Only set operation type if not already in a conversational flow
+    if (lowerInput.includes('resolve') && !lowerInput.includes('address')) {
+      operationType = "resolveName";
+    } else if (wantsAllNfds || lowerInput.includes('all')) {
+      operationType = "getAllNfds";
+    } else {
+      // Default: try to resolve as name
+      operationType = "resolveName";
+    }
+
+    // For other operations (resolve name, reverse lookup), use direct API call with operation type
+    return await fetch("/api/nfd-names", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        text: currentInput,
+        operation: operationType 
+      }),
+    });
+  };
+
+  // Format NFD response for display as HTML cards
+  const formatNFDResponse = (data: any): string => {
+    const { data: nfdData, lookupType, input } = data;
+    
+    if (!nfdData) {
+      return `<div style="color: #ef4444; padding: 1rem;">❌ No NFD information found for: ${input}</div>`;
+    }
+    // Helper function to create a card for a single NFD
+    const createNFDCard = (nfd: any, index?: number): string => {
+      const cardStyle = `
+        background: linear-gradient(135deg, rgba(33, 33, 33, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%);
+        border: 1px solid rgba(107, 114, 128, 0.2);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+      `;
+      
+      const labelStyle = `color: #9ca3af; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; margin-bottom: 0.25rem;`;
+      const valueStyle = `color: #e5e7eb; font-size: 0.875rem; word-break: break-all;`;
+      const nameStyle = `color: #ffffff; font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;`;
+      
+      let card = `<div style="${cardStyle}">`;
+      
+      // Card header with name
+      if (nfd.name) {
+        card += `<div style="${nameStyle}">
+          <span style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 0.25rem 0.75rem; border-radius: 0.5rem; font-size: 0.875rem; color: white;">${index !== undefined ? `#${index + 1}` : 'NFD'}</span>
+          <span>${nfd.name}</span>
+        </div>`;
+      }
+      
+      // Card body with details in grid
+      card += `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">`;
+      
+      if (nfd.id) {
+        card += `<div>
+          <div style="${labelStyle}">NFD ID</div>
+          <div style="${valueStyle}">${nfd.id}</div>
+        </div>`;
+      }
+      
+      if (nfd.appID) {
+        card += `<div>
+          <div style="${labelStyle}">App ID</div>
+          <div style="${valueStyle}">${nfd.appID}</div>
+        </div>`;
+      }
+      
+      if (nfd.asaID) {
+        card += `<div>
+          <div style="${labelStyle}">ASA ID</div>
+          <div style="${valueStyle}">${nfd.asaID}</div>
+        </div>`;
+      }
+      
+      if (nfd.state) {
+        const stateColor = nfd.state === 'owned' ? '#10b981' : nfd.state === 'forSale' ? '#f59e0b' : '#6b7280';
+        card += `<div>
+          <div style="${labelStyle}">State</div>
+          <div style="${valueStyle}">
+            <span style="background: ${stateColor}; padding: 0.125rem 0.5rem; border-radius: 0.375rem; font-size: 0.75rem; color: white; display: inline-block;">${nfd.state}</span>
+          </div>
+        </div>`;
+      }
+      
+      if (nfd.caAlgo && Array.isArray(nfd.caAlgo) && nfd.caAlgo.length > 0) {
+        card += `<div style="grid-column: 1 / -1;">
+          <div style="${labelStyle}">Address</div>
+          <div style="${valueStyle}; font-family: monospace; background: rgba(107, 114, 128, 0.1); padding: 0.5rem; border-radius: 0.5rem;">${nfd.caAlgo[0]}</div>
+        </div>`;
+      }
+      
+      if (nfd.owner) {
+        card += `<div style="grid-column: 1 / -1;">
+          <div style="${labelStyle}">Owner</div>
+          <div style="${valueStyle}; font-family: monospace; background: rgba(107, 114, 128, 0.1); padding: 0.5rem; border-radius: 0.5rem;">${nfd.owner}</div>
+        </div>`;
+      }
+      
+      if (nfd.depositAccount) {
+        card += `<div style="grid-column: 1 / -1;">
+          <div style="${labelStyle}">Deposit Account</div>
+          <div style="${valueStyle}; font-family: monospace; background: rgba(107, 114, 128, 0.1); padding: 0.5rem; border-radius: 0.5rem;">${nfd.depositAccount}</div>
+        </div>`;
+      }
+      
+      if (nfd.timeCreated) {
+        const createdDate = new Date(nfd.timeCreated * 1000).toLocaleString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        card += `<div>
+          <div style="${labelStyle}">Created</div>
+          <div style="${valueStyle}">${createdDate}</div>
+        </div>`;
+      }
+      
+      if (nfd.timeExpires) {
+        const expiresDate = new Date(nfd.timeExpires * 1000).toLocaleString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        card += `<div>
+          <div style="${labelStyle}">Expires</div>
+          <div style="${valueStyle}">${expiresDate}</div>
+        </div>`;
+      }
+      
+      // Helper function to render nested properties
+      const renderPropertyValue = (value: any, depth: number = 0): string => {
+        if (value === null || value === undefined) {
+          return '<span style="color: #6b7280;">null</span>';
+        }
+        
+        if (Array.isArray(value)) {
+          if (value.length === 0) {
+            return '<span style="color: #6b7280;">[]</span>';
+          }
+          let html = '<div style="margin-left: 1rem;">';
+          value.forEach((item, idx) => {
+            html += `<div style="margin-bottom: 0.25rem;">
+              <span style="color: #9ca3af;">[${idx}]:</span> ${renderPropertyValue(item, depth + 1)}
+            </div>`;
+          });
+          html += '</div>';
+          return html;
+        }
+        
+        if (typeof value === 'object') {
+          const keys = Object.keys(value);
+          if (keys.length === 0) {
+            return '<span style="color: #6b7280;">{}</span>';
+          }
+          let html = '<div style="margin-left: 1rem; border-left: 2px solid rgba(99, 102, 241, 0.3); padding-left: 0.75rem;">';
+          keys.forEach((key) => {
+            html += `<div style="margin-bottom: 0.5rem;">
+              <span style="color: #a78bfa; font-weight: 600; font-size: 0.75rem;">${key}:</span>
+              <div style="margin-top: 0.25rem;">${renderPropertyValue(value[key], depth + 1)}</div>
+            </div>`;
+          });
+          html += '</div>';
+          return html;
+        }
+        
+        // Primitive values
+        if (typeof value === 'string') {
+          return `<span style="color: #e5e7eb;">${value}</span>`;
+        }
+        if (typeof value === 'number' || typeof value === 'boolean') {
+          return `<span style="color: #60a5fa;">${value}</span>`;
+        }
+        
+        return `<span style="color: #e5e7eb;">${String(value)}</span>`;
+      };
+
+      if (nfd.properties && typeof nfd.properties === 'object' && Object.keys(nfd.properties).length > 0) {
+        card += `<div style="grid-column: 1 / -1; margin-top: 0.5rem; padding-top: 1rem; border-top: 1px solid rgba(107, 114, 128, 0.2);">
+          <div style="${labelStyle}">Properties</div>
+          <div style="background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 0.5rem; padding: 1rem; margin-top: 0.75rem;">`;
+        
+        Object.entries(nfd.properties).forEach(([key, value]: [string, any]) => {
+          card += `<div style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(107, 114, 128, 0.1);">
+            <div style="color: #a78bfa; font-weight: 700; font-size: 0.875rem; margin-bottom: 0.5rem; text-transform: capitalize;">${key}</div>
+            <div style="color: #e5e7eb; font-size: 0.875rem;">
+              ${renderPropertyValue(value)}
+            </div>
+          </div>`;
+        });
+        
+        card += `</div></div>`;
+      }
+      
+      card += `</div></div>`;
+      return card;
+    };
+
+    // Handle reverse lookup (address to NFD names)
+    if (lookupType === 'address') {
+      if (Array.isArray(nfdData) && nfdData.length > 0) {
+        let result = `<div style="margin-bottom: 1.5rem;">
+          <div style="color: #10b981; font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;">✅ Found ${nfdData.length} NFD name(s) for address:</div>
+          <div style="font-family: monospace; color: #9ca3af; background: rgba(107, 114, 128, 0.1); padding: 0.5rem; border-radius: 0.5rem; display: inline-block;">${input}</div>
+        </div>`;
+        nfdData.forEach((nfd: any, index: number) => {
+          result += createNFDCard(nfd, index);
+        });
+        return result;
+      } else {
+        return `<div style="color: #ef4444; padding: 1rem;">❌ No NFD names found for address: <code style="background: rgba(107, 114, 128, 0.1); padding: 0.25rem 0.5rem; border-radius: 0.25rem;">${input}</code></div>`;
+      }
+    }
+
+    // Handle all NFDs lookup (comprehensive list from v2/search API)
+    if (lookupType === 'all-nfds') {
+      if (Array.isArray(nfdData) && nfdData.length > 0) {
+        let result = `<div style="margin-bottom: 1.5rem;">
+          <div style="color: #10b981; font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;">✅ Found ${nfdData.length} NFD(s) owned by address:</div>
+          <div style="font-family: monospace; color: #9ca3af; background: rgba(107, 114, 128, 0.1); padding: 0.5rem; border-radius: 0.5rem; display: inline-block;">${input}</div>
+        </div>`;
+        nfdData.forEach((nfd: any, index: number) => {
+          result += createNFDCard(nfd, index);
+        });
+        return result;
+      } else {
+        return `<div style="color: #ef4444; padding: 1rem;">❌ No NFD names found for address: <code style="background: rgba(107, 114, 128, 0.1); padding: 0.25rem 0.5rem; border-radius: 0.25rem;">${input}</code></div>`;
+      }
+    }
+
+    // Handle forward lookup (NFD name to address)
+    if (lookupType === 'name') {
+      return createNFDCard(nfdData);
+    }
+
+    // Fallback for unknown type
+    return `<div style="color: #10b981; padding: 1rem;">✅ NFD Information:</div><pre style="background: rgba(107, 114, 128, 0.1); padding: 1rem; border-radius: 0.5rem; overflow-x: auto; color: #e5e7eb;">${JSON.stringify(nfdData, null, 2)}</pre>`;
+  };
+
   interface AbiMethod {
     name: string;
     args: { name: string; type: string }[];
@@ -1517,7 +1998,7 @@ const ${name} = async (${paramNames}) => {
       switch (activeTab) {
         case "mint":
           response = await handleMintSubmit(currentInput);
-          if (!response) return; // Early return if mint flow ended early
+          if (!response) return; 
           break;
 
         case "swap-tokens":
@@ -1537,12 +2018,12 @@ const ${name} = async (${paramNames}) => {
 
         case "mint-token":
           response = await handleMintTokenSubmit(currentInput);
-          if (!response) return; // Early return if mint flow ended early
+          if (!response) return; 
           break;
 
         case "get-quotes":
           response = await handleGetQuotes(currentInput);
-          if (!response) return; // Early return if mint flow ended early
+          if (!response) return; 
           break;
         // case "swap":
         //   await handleSwapSubmit(currentInput, setMessages, setSwapState);
@@ -1569,6 +2050,10 @@ const ${name} = async (${paramNames}) => {
         case "ecosystem-project":
           response = await handleEcosystemProjectSubmit(currentInput);
           break;
+        case "nfd-names":
+          response = await handleNFDNamesSubmit(currentInput, setMessages);
+          if (!response) return; // Early return if flow is handled internally
+          break;
         case "general":
           response = await handleGeneralSubmit(currentInput);
           break;
@@ -1584,10 +2069,27 @@ const ${name} = async (${paramNames}) => {
           setError(data.error);
           setMessages((prev) => [
             ...prev,
-            { role: "assistant", content: `Error: ${data.error}` },
+            { role: "assistant", content: `❌ Error: ${data.error}` },
           ]);
+          // Reset NFD lookup state on error so user can start a new operation
+          if (activeTab === "nfd-names") {
+            setPendingNFDLookup(null);
+          }
           return;
         }
+        
+        // Format NFD response
+        if (activeTab === "nfd-names" && data.data) {
+          const formattedContent = formatNFDResponse(data);
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: formattedContent },
+          ]);
+          // Reset NFD lookup state so user can start a new operation
+          setPendingNFDLookup(null);
+          return;
+        }
+        
         // For minting, you might want to extract and show the transaction link from data.data
         setMessages((prev) => [
           ...prev,
@@ -1646,11 +2148,16 @@ const ${name} = async (${paramNames}) => {
       label: "Ecosystem Projects",
       icon: <Network size={20} />,
     },
+    {
+      id: "nfd-names",
+      label: "Algorand NFD Names",
+      icon: <Tag size={20} />,
+    },
   ];
 
   const visibleTabs = activeAddress
     ? tabs
-    : tabs.filter((tab) => tab.id === "general" || tab.id === "ecosystem-project");
+    : tabs.filter((tab) => tab.id === "general" || tab.id === "ecosystem-project" || tab.id === "nfd-names");
 
 
 
@@ -1733,7 +2240,7 @@ const ${name} = async (${paramNames}) => {
       </div>
 
       <div className="flex-1 flex flex-col bg-gradient-to-b from-black/60 to-gray-900/10 backdrop-blur-md">
-        {messages.length === 0 && !(activeTab === "algorand-helper") && !(activeTab === "ecosystem-project") ? (
+        {messages.length === 0 && !(activeTab === "algorand-helper") && !(activeTab === "ecosystem-project") && !(activeTab === "nfd-names") ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8">
             <div className="rounded-full bg-gray-500/10 p-6 mb-6">
               <Image
@@ -1842,6 +2349,37 @@ const ${name} = async (${paramNames}) => {
               </div>
             </div>
           </>
+        ) : messages.length === 0 && activeTab === "nfd-names" ? (
+          <>
+            <div className="flex-1 flex flex-col items-center justify-center p-8">
+              <div className="rounded-full bg-gray-500/10 mb-6 flex items-center justify-center">
+                <Tag className="text-gray-400 w-20 h-20" size={80} />
+              </div>
+              <h2 className="text-2xl text-gray-100 mb-3 font-bold">
+                Algorand NFD Names
+              </h2>
+              <p className="text-center max-w-md mb-8 text-yellow-400">
+                Look up Algorand NameFi Domains (NFD) names and addresses. Three operations available: resolve name to address, reverse lookup address to names, or get all NFDs for an address.
+              </p>
+              <div className="grid grid-cols-2 gap-4 w-full max-w-4xl">
+                {[
+                  "Resolve NFD name to address",
+                  "Reverse lookup: Address to NFD names",
+                  "Get all NFDs for an address",
+                ].map((suggestion, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      setUserInput(suggestion);
+                    }}
+                    className="bg-gray-500/10 whitespace-nowrap hover:bg-gray-500/20 text-gray-200 p-4 rounded-xl border border-gray-500/10 text-left transition-all duration-200 hover:border-gray-500/30"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
         ) : (
           <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-500/20">
             {messages.map((message, index) => (
@@ -1933,7 +2471,9 @@ const ${name} = async (${paramNames}) => {
                                   ? "e.g., 'Ask Anything You Want From Algorand Ecosystem :  Oracles , RPC's , Contracts etc'"
                                   : activeTab === "ecosystem-project"
                                     ? "e.g., 'List all wallets in the ecosystem'"
-                                    : activeTab === "mint-token"
+                                    : activeTab === "nfd-names"
+                                      ? "e.g., 'Resolve NFD name to address' or 'Find NFD name for an address'"
+                                      : activeTab === "mint-token"
                                     ? "e.g., 'Mint your personalized tokens in single prompt'" : activeTab === "get-quotes"
                                       ? "e.g., 'Get any token quotes by just ticker'" : activeTab === "transfer-token"
                                         ? "e.g., 'Transfer Tokens to Receiver Just By Communication'" : activeTab === "transfer-native-token"
@@ -1958,7 +2498,7 @@ const ${name} = async (${paramNames}) => {
               type="submit"
               disabled={
                 loading ||
-                (!activeAddress && activeTab !== "general" && activeTab !== "ecosystem-project") ||
+                (!activeAddress && activeTab !== "general" && activeTab !== "ecosystem-project" && activeTab !== "nfd-names") ||
                 !userInput.trim()
               }
               className="bg-gradient-to-r from-gray-500 to-white hover:from-gray-600 hover:to-gray-400 disabled:from-gray-600 disabled:to-gray-700 text-white p-4 rounded-xl flex items-center justify-center transition-all duration-300 hover:shadow-lg hover:shadow-gray-500/20 disabled:shadow-none h-12 w-12 mb-2"
