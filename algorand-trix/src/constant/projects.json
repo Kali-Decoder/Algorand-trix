@@ -1,0 +1,766 @@
+{
+    "categories": {
+      "Create Publication": [
+        {
+          "name": "algoDEA",
+          "description": "algoDEA Algorand IntelliJ Plugin provides end to end development life-cycle on Algorand blockchain using IntelliJ IDE. Using this plugin, developers can create and test both stateless and stateful smart contracts directly from their IntelliJ IDE. It also provides other features like ASA management, transactions, test account management etc. GitHub: https://github.com/bloxbean/algodea",
+          "category": "Create Publication",
+          "website": "https://algodea-docs.bloxbean.com/"
+        },
+        {
+          "name": "Algodesk.io",
+          "description": "Build. Test. Execute. Algodesk provides open-source and developer-friendly tools to build decentralized apps and smart contracts on Algorand network. One can quickly create ASA and compile ASC1 and more without installing anything.",
+          "category": "Create Publication",
+          "website": "https://algodesk.io/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2021/09/29/algodesk.jpeg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Pocket Network",
+          "description": "Pocket uses a native cryptocurrency (POKT) to create a permissionless, two-sided marketplace between node and developers that want to query data from a blockchain for an application or service.",
+          "category": "Create Publication",
+          "website": "https://www.pokt.network/"
+        },
+        {
+          "name": "AA Notarization",
+          "description": "Documents can be any type of digital file (MSOffice docs, texts, images, videos, pdf, xml, …). Any document stored in Alfresco can be notarized, manually (with a single click) or in a batch process. It’s also possible to check if a previously notarized document is still valid (i.e.: it has not been modified after the notarization). On the technical side, this extension computes the hash (sha256) of a document stored in Alfresco, builds a json object with the hash and other related metadata and creates a transaction in the Algorand blockchain. The json object is stored in the note field of the transaction and a new set of metadata related to that transaction (document hash, block id, transaction id, transaction time, account address) is associated with the document in Alfresco.",
+          "category": "Create Publication",
+          "github": "https://github.com/david-ciamberlano/aa-notarization"
+        },
+        {
+          "name": "Kaafila",
+          "description": "Kaafila is a decentralized media and education project built with blockchain technology of Algorand and IPFS. We have started with a new video sharing app to support independent content creators, through which we will offer a wide range of free courses, with tests, certifications, and internships to our Users worldwide. Kaafila will educate and enable career growth for Users in multiple industries, with top focus on software industry. Kaafila is developing a portfolio of software/blockchain apps: Decentralized Video Sharing App, NFT Marketplace, Courses System, Metaverse for Virtual Learning, Universal Payment System, and a New Programming Language — to create a “blockchain ecosystem” that’s driven by constant innovation, and supported by Users worldwide. All apps have a common theme of “knowledge sharing and monetizing of knowledge” in the blockchain economy, which has huge growth ahead. Kaafila Metaverse is a virtual world with Virtual Classrooms, Virtual Offices, Research Labs, Industry Parks for Renewable Energy, Software & Biotech, Industry Events, and Virtual Travel, including space travel. Kaafila Metaverse will combine AI and Blockchain Technology to create high engagement and innovation. Top three focus areas of Kaafila Metaverse are: (1) virtual learning (virtual classrooms, research labs) (2) virtual working (virtual offices, industry events/expos/industry parks) (3) virtual travel (virtual space travel, time travel)",
+          "category": "Create Publication",
+          "website": "https://app.kaafila.org/#/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/10/21/Kaafila.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "NFT Jam",
+          "description": "Jam-powered decentralized app allowing anyone with an NFT, or any asset, to create an auction with ease. Built using Reach and Reactjs. Currently in development running on Testnet.",
+          "category": "Create Publication",
+          "website": "https://nftjam.net",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2021/09/29/nftjam.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "bountyblok",
+          "description": "Gamification Tools for Blockchain Apps, NFT Artists, Brands and more. bountyblok is built for NFT Artists, brands and various projects who want to engage their followers with a set of tasks while earning rewards. Also built for developers who want to add gaming mechanics inside their projects. bountyblok.io's APIs allow your team to create challenges and tasks to further engage your users. Increase their activity within your web or mobile apps through minimal effort and integration. Create a challenge, define some rules, and earn achievements.",
+          "category": "Create Publication",
+          "website": "https://www.bountyblok.io/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/10/25/bountyblok.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "TechTree",
+          "description": "TechTree is a socio-economic network which enables tech talent to generate and share value created by their personal assets. TechTree offers a platform for companies to source tech people from their networks - not just their employees or recruiters. A company’s investors, partners, and wider community, which inherently have vested interest in the company’s long-term success, can help bring the best talent in, have value attributed to their efforts, and be rewarded for the value they add.",
+          "category": "Create Publication",
+          "website": "https://techtree.dev/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/10/25/TechTree.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "React-Algorand",
+          "description": "React-Algorand is an npm package that allows a user to create simple wallet applications for pay transactions, scheduled transactions, interactive UI with rendered metadata for processing transactions and can be configured for both MainNet and TestNet.",
+          "category": "Create Publication",
+          "website": "https://www.npmjs.com/package/react-algorand",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2021/09/29/react.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Dart SDK",
+          "description": "Algorand-dart is a community SDK with an elegant approach to connect your Dart & Flutter applications to the Algorand blockchain, send transactions, create assets and query the indexer with just a few lines of code.",
+          "category": "Create Publication",
+          "website": "https://pub.dev/packages/algorand_dart"
+        },
+        {
+          "name": "PHP SDK (2)",
+          "description": "Algorand-php is a community SDK with an elegant approach to connect your application to the Algorand blockchain, send transactions, create assets and query the indexer with just a few lines of code. We've added special support to make the life of a Laravel developer even more easy!",
+          "category": "Create Publication",
+          "github": "https://github.com/RootSoft/algorand-php"
+        }
+      ],
+      "Algorand IDEs": [
+        {
+          "name": "dev.algorand.co",
+          "description": "",
+          "category": "Algorand IDEs",
+          "website": "https://dev.algorand.co"
+        },
+        {
+          "name": "Defly Wallet",
+          "description": "Defly is a secure Algorand wallet with advanced features you will love. It works well as a basic wallet but also offers unique features for DeFi trading. It contains very comprehensive market data streams, swaps get optimized by using liquidity across DEXs, and your DeFi positions are tracked (farming, staking, lending).",
+          "category": "Algorand IDEs",
+          "website": "https://defly.app/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/10/03/defly.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Lute",
+          "description": "Lute is an Algorand web wallet for Ledger hardware users. It allows for multiple accounts per Ledger, as well as accounts that are rekeyed to a Ledger.",
+          "category": "Algorand IDEs",
+          "website": "https://lute.app/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2024/02/07/lute_0wnC2dk.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Pera Wallet",
+          "description": "Pera is the most popular mobile wallet on the Algorand ecosystem. Hold, transact, and manage your assets all in one place, taking comfort in the fact that your private keys and data never leaves your phone. Interact with the Algorand Blockchain, earn rewards, connect with dApps, pair Ledger Nano X accounts, display your NFTs and buy or sell Algo with native integrations.",
+          "category": "Algorand IDEs",
+          "website": "https://perawallet.app/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/03/01/pera.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "CUDOS",
+          "description": "The CUDOS Validator Network (CVN) provides blockchain developers with access to highly scalable compute resources for a fraction of the cost.",
+          "category": "Algorand IDEs",
+          "website": "https://www.cudos.org/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/07/12/CUDOS.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Dedit",
+          "description": "Dedit allows you to easily notarize any type of digital document or title on Algorand blockchain blockchain providing timestamp, proof of existence, proof og ownership and immutability over time.",
+          "category": "Algorand IDEs",
+          "website": "https://dedit.io/eng/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/07/12/dedit.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Mentat",
+          "description": "Developing an open-source SAP connector and Enablement API to the Algorand Blockchain",
+          "category": "Algorand IDEs",
+          "website": "https://ment.at/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/07/12/Mentatsquare.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Simple Algo",
+          "description": "Simple Algo is an npm package that supports JavaScript and TypeScript. The package allows a user to interact with the Algorand protocol using standalone functions and API calls for account and blockchain information.",
+          "category": "Algorand IDEs",
+          "website": "https://www.npmjs.com/package/simplealgo"
+        },
+        {
+          "name": "AlgoDaddy",
+          "description": "AlgoDaddy is a free community resource for educational guides and articles covering Algorand and its ecosystem.",
+          "category": "Algorand IDEs",
+          "website": "http://www.algodaddy.org",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/07/11/algodaddy.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Algogator.Finance",
+          "description": "An Algorand Portfolio Tracker to view all assets, standardized NFTs, prices, yield farming, and liquidity pools for any given address on the network. Social Media: https://twitter.com/TeamAlgogator",
+          "category": "Algorand IDEs",
+          "website": "https://algogator.finance/"
+        },
+        {
+          "name": "AlgoNim",
+          "description": "AlgoNim is a very simple mathematical game of strategy for two players. It is cryptographic version of Nim that runs on Algorand Layer 1, directly on the Pure Proof of Stake consensus protocol, so nobody can cheat. The game implementation takes advantage of all the features introduced in Algorand 2.0 protocol: Algorand Standard Assets (ASA), Atomic Transfers (AT) and Algorand Smart Contracts (ASC1) using Algorand Python SDK + PyTeal. PyTeal is a binding for TEAL, the stateless bytecode stack-based language for ASC1, in this sense AlgoNim is a truly stateless game.",
+          "category": "Algorand IDEs",
+          "github": "https://github.com/cusma/algonim",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/10/26/Algonim600x600.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "AlgoWorld",
+          "description": "AlgoWorld, a collectible NFT card game where each NFT represents 193 countries in the world is excited to announce that its Algorand smart contracts powered nft trading platform called AlgoWorldExplorer now supports the latest WalletConnect enabled Algorand Wallet! AlgoWorldExplorer users can now authenticate and sign transactions directly from the Algorand Wallet app!",
+          "category": "Algorand IDEs",
+          "website": "https://algoworld.io/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/11/08/algoworld-new-logo.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "GoPlausible",
+          "description": "GoPlausible is Proof Of Anything Protocol on Algorand. Being Token-less, dynamic and completely permission-less as well as many more control dimensions provided by GoPlausible makes it completely unique! Plausible is packed with many features out of the box to help creators, developers , owners and users in general to distribute proofs, tokens and NFTs in a Web 2.5 way! Plausible will use Algorand State Proofs to go multi-chain and will be the first of its kind to do so! A multi-chain Proof of Anything Protocol!",
+          "category": "Algorand IDEs",
+          "website": "https://goplausible.com",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/07/11/GoPlausible.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Green House Finance",
+          "description": "Making homes more sustainable with the Algorand blockchain. Issuance of depositary receipts for shares on the Algorand blockchain. Building a loyalty system for Green House Finance on the Algorand blockchain.",
+          "category": "Algorand IDEs",
+          "website": "https://greenhousefinance.nl/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/10/24/greenhousefinance.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Lofty AI",
+          "description": "Lofty AI's model allows anyone to become a direct owner in real estate and earn rental income for as little as $50 per token and in as few as five minutes, made possible with its blockchain-based solution on Algorand. Unique to Lofty AI, properties listed within the marketplace are vetted by both their local investment team and proprietary artificial intelligence, designed to more accurately evaluate market indicators that drive appreciation, including social media data, retail trends, and more. Lofty AI's mission is to bring liquidity and accessibility to the notoriously illiquid real estate market.",
+          "category": "Algorand IDEs",
+          "website": "https://www.lofty.ai/"
+        },
+        {
+          "name": "NF Domains",
+          "description": "A naming service for Algorand wallets. Send and receive crypto using a .algo NFD name that is unique and easy to remember. Add your profile, avatar, and social links. We will offer verification services for things like Discord, Twitter and Telegram. Our solution will be integrated in all major wallet providers, block explorers, marketplaces, and anywhere else a wallet address can be seen. We are using three smart contracts, two smart signatures, and an ASA which is used to dynamically represent the NFD in your wallet. TxnLab published a draft ARC spec for an ARC3 with mutability which we will be utilizing to do this. TxnLab has also built custom APIs for any integrator to use, although all the data can be seen and read on-chain. Our marketplace for buying and selling NFDs will only be in ALGO. Behind the scenes, some of our treasury management will also be done on-chain using ALGO and ALGO USDC.",
+          "category": "Algorand IDEs",
+          "website": "https://nf.domains/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/10/25/NFD.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Panama Canal",
+          "description": "Algorand in Panama Canal (logistic hub) Leonaxa construe a system distintive sequence (digital water) to reduce water utility cost this software service is development with Canadian, Quebec innovation and research technology service provider for startups / company engagement in Panama Canal logistic hub. Leonaxa time frame asset moves exclusive to Panama Canal global Atlantic trade. The inquiry is to meet with a representative to find what hardware and software requirements will be needed to develop a web app portal for investors to fund the project. Transport from Ports of Quebec to Panama Canal to tokenize materialized containers with encryption of content. This project follows the e-trade road map detailed by governance (Panama embassy in Canada and Panama, Colon president of commerce). Singapore is our main competitor geopolically, ideally on Algorand ecosystem we can co-operate ASA financial services .",
+          "category": "Algorand IDEs",
+          "website": "https://leonaxa.com"
+        },
+        {
+          "name": "SecureCerts",
+          "description": "SecureCerts is a decentralized application (dApp) based on Algorand blockchain network. This dApp facilitates issuing immutable digital certificates with the help of blockchain technology.",
+          "category": "Algorand IDEs",
+          "website": "https://securecerts.in/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2021/10/06/securecerts.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Tinyman",
+          "description": "Tinyman is a re-imagined decentralized trading protocol which utilizes the fast and secure framework of the Algorand blockchain, creating an open and safe marketplace for traders, liquidity providers, and developers.",
+          "category": "Algorand IDEs",
+          "website": "https://tinyman.org/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/10/26/Tinyman_Logo_Black1018x1018.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "TrackAlgo",
+          "description": "TrackAlgo is a proof of concept materials tracking application that leverages the \"note\" field of a payment transaction to store metadata about an item, including things like coordinates and temperature. This showcases how an IoT application would be used in conjunction with the Algorand blockchain.",
+          "category": "Algorand IDEs",
+          "github": "https://github.com/Man-Jain/TrackAlgo"
+        },
+        {
+          "name": "troki",
+          "description": "Troki.io is a platform for minting and trading private fungible tokens. Smart contracts hold bid information and are self-organized into communities. Troki finds matching patterns and links smart contracts together in multi-party transactions to complete the requested trades. Troki.io is a smart-contract based exchange for minting and trading tokens on the Algorand blockchain.",
+          "category": "Algorand IDEs",
+          "website": "https://www.troki.io/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/10/26/Troki.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Workout and Research",
+          "description": "WAR is a revolutionary new token that combines the power of blockchain technology with the world of fitness. It provides access to exclusive deals and discounts on the best fitness products available from Workout and Research, making it easy and accessible for everyone. With $WAR, you will be supporting fitness communities and promoting a healthy lifestyle. We invite you to join our community and become a part of the future of fitness.",
+          "category": "Algorand IDEs",
+          "website": "http://workoutandresearch.com",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/07/11/workout.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Discord",
+          "description": "Algorand Developer Discord channel. Want to connect with other Algorand developers, as several members already have? Join Algorand Developer Discord today!",
+          "category": "Algorand IDEs",
+          "website": "https://discord.gg/7DG4U2aCPY",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2021/09/29/discord.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Algorand for Visual Studio Extension",
+          "description": "C# to TEAL compiler/transpiler with Visual Studio integrated Algorand development tooling. This is a VSIX extension that adds Algorand support to Visual Studio - the flagship IDE aimed at mainstream Microsoft developers, Unity game developers and more. This offers edit time code analysis (showing C# diagnostics in-editor related to TEAL compilation and smart contract generation) TEAL compilation from C#, inter-contract referencing, tools for deployment to networks, in-editor opcode cost and program size, project templates for building web, mobile and games with Algorand as a backend, debugging and more. The Visual Studio extensions will generate project templates that use the .NET SDK for activities like run-time contract deployment. The overall aim is to make development of Algorand-based systems simple, especially for those coming from the mainstream commercial software development world using Microsoft technologies. These tools enable developers to use the full capabilities of Algorand.",
+          "category": "Algorand IDEs",
+          "github": "https://github.com/FrankSzendzielarz/AlgorandVisualStudio/blob/main/README.md"
+        },
+        {
+          "name": "Algorand QRCode Generator",
+          "description": "A comprehensive javascript module with a complete set of tools to generate an standard Algorand URI (RFC 3986) and QR code, exportable to SVG, PNG and UTF8. Exported media types are File, UTF8 text and DataURL. Works in Terminal, Node and modern browsers. Contains a full set of examples including API server, static server and web form QR generator. Includes a full featured CLI to generate QR codes in terminals too.",
+          "category": "Algorand IDEs",
+          "github": "https://github.com/emg110/algorand-qrcode",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/02/08/QRCode.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "AwesomeAlgo",
+          "description": "Curated list of resource on everything related to the Algorand Blockchain Development.",
+          "category": "Algorand IDEs",
+          "website": "https://awesomealgo.com/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/11/08/awesomealgo-new-logo.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Algo Foundry",
+          "description": "Algo Foundry is a venture studio enabling founders to focus on building world-class Dapps. Algorand Foundation and Undercurrent Capital initiative to build out the ecosystem, our resources, playbooks, systems, network, and capital accelerate ideas by partnering with co-founders to build the best ideas into great companies. We also cultivate next-gen Algorand developers to be future-ready leaders in building great products through our courses. Algo Foundry builds world-class Dapps on the Algorand blockchain.",
+          "category": "Algorand IDEs",
+          "website": "https://algofoundry.studio/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/10/26/AlgoFoundry.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Algo Tides",
+          "description": "This Python application is a graphic interface for the user who owns or have access to an Algorand node and would like to issue operations through a GUI rather than CLI. (i.e.: manage wallets and addresses, send transactions, save a contact list)",
+          "category": "Algorand IDEs",
+          "github": "https://github.com/CiottiGiorgio/Algorand-Wallet-Manager",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2021/09/29/algotide.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Data History Museum",
+          "description": "Minting, cataloguing and selling verifiably authentic digital artifacts forged during the most significant events of human, terrestrial and cosmic history. Our mission is to automatically mint NFTs as an immediate and direct response to an event worthy of the historical record, as it happens in real time. We're getting started with earthquakes, minted automatically in response to detection of the earthquake at measurements stations around the world. We intend to share fee revenue with institutions providing data, and charities handling disaster relief. Algorand allows us to go beyond a typical NFT project, minting all events of significance. This would not be possible without an extremely low minting cost or without the extremely fast performance Algorand provides. In addition, the sustainable nature of Algorand pairs well with our ambition to change the way science is funded.",
+          "category": "Algorand IDEs",
+          "website": "https://museum.datahistory.org/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/10/25/DataHistoryMuseum.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "GetBlock",
+          "description": "GetBlock is a service that provides instant API connection to full nodes from many leading blockchain platforms. The mission of the GetBlock project is to facilitate the lives of startups and developers by providing them with the all-in-one tool for fast and easy integration of the decentralized network to their business projects. GetBlock is among the leaders of the Blockchain-as-a-Service (BaaS) segment: its instruments are utilized daily by thousands of users worldwide. Their clients can get their wallets, DEXs, bots, games to 40+ blockchains via an intuitive API-powered dashboard. GetBlock provides its users with access to Algorand (ALGO) shared nodes (https://getblock.io/nodes/algo/) and dedicated nodes (https://getblock.io/dedicated-nodes/algo/)",
+          "category": "Algorand IDEs",
+          "website": "https://getblock.io/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/10/25/getblock.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Headline Inc",
+          "description": "HEADLINE INC is a Texas-based fintech startup. We build software on the Algorand blockchain. We build tools for the Algorand ecosystem, including AlgoPay - an embeddable payments Dapp, AlgoSwap - an embeddable DEX solution, and DAO Tools - a full suite DAO toolkit. Along with our Algorand agnostic products we also have proprietary software including: AlgoCloud - A full analytics & DeFi dashboard for the Algorand Ecosystem PIPELINE-UI - Built in collaboration with the Algorand Foundations grant program - An on-ramp for developers to build on the Algorand blockchain and interact with REACH's smart contracts FORUM - a Proof-of-Stake social network with over 1,000 users. Must hold HDL to access. Libra Network & Bias Barometer- AI/NLP Processor used to detect Left/Right bias in online articles.",
+          "category": "Algorand IDEs",
+          "website": "https://www.headline-inc.com/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/10/25/Headline.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "LoginID FIDO Vault",
+          "description": "The LoginID FIDO Vault provides simple, secure Algorand account setup and transaction support utilizing the FIDO hardware security standard and device biometrics. By integrating FIDO tools into the Algorand ecosystem, developers can leverage millions of end-users who will now be able to use any mobile device or laptop biometrics to execute an Algorand Smart Contract - without the need for a plugin or downloadable application. - Provide simple SDKs for Algorand developers to integrate FIDO - Simplify the smart contract experience for end-users, by using existing device biometrics helping build mass-adoption Algorand in market - Make Algorand the first blockchain to potentially bridge millions of pre-KYC’ed identities from Web 2.0 to Algorand, through LoginID relationships such as Visa",
+          "category": "Algorand IDEs",
+          "website": "https://www.loginid.io/"
+        },
+        {
+          "name": "Quick-Algo",
+          "description": "This script provides node runners with the easiest way to get up and running with an Algorand Node. It extrapolates some of the complexities of setting file permissions, downloading the correct scripts, and running these scripts and allows you to run just one command and start working with the Algorand APIs.",
+          "category": "Algorand IDEs",
+          "github": "https://github.com/danmurphy1217/algorand-quickstart"
+        },
+        {
+          "name": "Tatum",
+          "description": "The Tatum framework is the fastest way to build, test and run blockchain apps. A single, unified Javascript SDK, for over 40+ blockchain protocols. Simplify your development and integrate any blockchain directly into your JavaScript backend. Tatum reduces development time for your application with streamlined API's for blockchain operations. Algorand is directly integrated into the Tatum SDK. Our framework and API's allows for developers to build on Algorand quickly and easily.",
+          "category": "Algorand IDEs",
+          "website": "https://tatum.io/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/10/26/Tatum200x200.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Vestige",
+          "description": "Vestige is the all-in-one trading platform for Algorand assets. Vestige is the most reliable data platform for Algorand assets, integrating multiple data sources into easy to digest asset pages. It allows traders to find new ASA's as well as monitor their value. The platform continuously improves with new features and integrates new AMMs.",
+          "category": "Algorand IDEs",
+          "website": "https://vestige.fi/"
+        },
+        {
+          "name": "Verida",
+          "description": "Verida is a full stack development framework and decentralized personal data network for Web3. Our SDK provides capabilities to build Web3 applications to match the features of Web2. Verida is a network of personal data storage, identity, messaging, and single sign-on solutions enabling interoperable ownership of personal data. Verida provides decentralized identity, trusted storage, private data ownership, decentralized messaging and connectivity to the Algorand blockchain.",
+          "category": "Algorand IDEs",
+          "website": "https://www.verida.io/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/10/25/verida.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Entersoft",
+          "description": "ENTERSOFT is a team of White Hats who take an offensive approach in Smart Contract Audits & Penetration Testing. With a team of elite ethical hackers, Entersoft brings an offensive security mindset to the Web 3.0 world. Entersoft is a leading, emerging technology cyber security firm helping Web 2.0 and Web 3.0 organisations secure their digital assets. Our security experts are highly skilled in addressing the multitude of cybersecurity threats facing Blockchain and Crypto organisations today. We are securing the algorand ecosystem. Experience in Reach, PyTeal, TEAL, Javascript, Solidity and more.",
+          "category": "Algorand IDEs",
+          "website": "https://entersoftaudits.com/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/10/25/Entersoft.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Algonaut",
+          "description": "Provides open source community projects for the Algorand ecosystem. Repositories include: Vue components & validation of fields for Algorand JavaScript SDK",
+          "category": "Algorand IDEs",
+          "github": "https://github.com/algonaut",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2021/09/29/algonaut.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Algorand Builder",
+          "description": "CLI framework to automate development of Algorand Assets and Smart Contracts. Algorand builder is a trustworthy framework for Algorand dapps (Decentralized Applications). Its main goal is to make shipping Algorand applications simple, efficient, and scalable. Think about it as a Truffle suite for Algorand.",
+          "category": "Algorand IDEs",
+          "github": "https://github.com/scale-it/algorand-builder"
+        },
+        {
+          "name": "Algorand-React-Component",
+          "description": "A set of reusable functional React components for creating and signing transactions, writing to the note field of a transaction, multisig transactions, offline account generation and mnemonic account recover. This tool acts a wrapper to the Algorand JavaScript SDK.",
+          "category": "Algorand IDEs",
+          "github": "https://github.com/mmitrasish/algorand-sdk-react-component",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2021/09/29/react.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "PIPELINE-UI",
+          "description": "Pipeline UI is a ready-to-use library to rapidly add standardized Algorand functional components to your React apps.",
+          "category": "Algorand IDEs",
+          "website": "https://www.pipeline-ui.com/"
+        },
+        {
+          "name": "AlgoMint",
+          "description": "Removing the speed and cost hurdles for BTC and ETH through implementing synthetic versions on Algorand while retaining and enjoying the original assets' store-of-value properties.",
+          "category": "Algorand IDEs",
+          "website": "https://www.algomint.io/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/06/07/AlgoMint.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Goracle",
+          "description": "Goracle is a unique abstraction layer decentralized oracle network that is built on the Algorand Blockchain that enables universally connected decentralized node networks, to securely interact as independent sources to provide critical off-chain, real time external data feeds needed by complex smart contracts to become a strong form of digital agreement.",
+          "category": "Algorand IDEs",
+          "website": "https://www.goracle.io/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/06/07/Goracle.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Icon",
+          "description": "Integration of Algorand into ICON's BTP interoperability ecosystem opens the door to new possibilities for the ICON ecosystem and ICX holders.",
+          "category": "Algorand IDEs",
+          "website": "https://www.icon.foundation/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/06/07/icon.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "London Bridge",
+          "description": "The secure bridge between Algorand and Ethereum. Transfer tokens using the additional security of State Proofs and Hardware Enclaves.",
+          "category": "Algorand IDEs",
+          "website": "https://londonbridge.io/"
+        },
+        {
+          "name": "Messina",
+          "description": "A bridge to enable noncustodial interactions between Ethereum and Algorand, opening opportunities to develop complex DeFi use cases and value chains.",
+          "category": "Algorand IDEs",
+          "website": "https://messina.one/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/06/07/Messina.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "pNetwork",
+          "description": "Partnering with Algorand as a cross-chain composability system that allows NFTs to move freely between blockchains and launch cross-chain bridges for the Algorand ecosystem.",
+          "category": "Algorand IDEs",
+          "website": "https://p.network/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/06/07/pNetwork.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Silent Data",
+          "description": "Silent Data empowers Algorand developers to validate data from private web2 accounts in their web3 smart contracts, without anyone being able to access to the private or sensitive information.",
+          "category": "Algorand IDEs",
+          "website": "https://silentdata.com/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/06/07/SilentData.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": ".NET Algorand SDK 2",
+          "description": "A maintained and up to date .NET SDK for Algorand.",
+          "category": "Algorand IDEs",
+          "github": "https://github.com/FrankSzendzielarz/dotnet-algorand-sdk"
+        },
+        {
+          "name": "PHP SDK (1)",
+          "description": "A PHP library for interacting with the Algorand network. (algod, kmd, indexer)",
+          "category": "Algorand IDEs",
+          "github": "https://github.com/ffsolutions/php-algorand-sdk"
+        },
+        {
+          "name": "Rust SDK",
+          "description": "Rust algonaut aims at becoming a rusty SDK for Algorand.",
+          "category": "Algorand IDEs",
+          "github": "https://github.com/manuelmauro/algonaut"
+        },
+        {
+          "name": "Swift SDK",
+          "description": "This is a swift sdk that allows interaction with the Algorand blockchain. It also supports interacting with the V2 indexer and Algo APIs.",
+          "category": "Algorand IDEs",
+          "github": "https://github.com/Jesulonimi21/Swift-Algorand-Sdk",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2021/09/29/swiftSDK.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Vertices SDK",
+          "description": "C SDK to interact with the Algorand Blockchain. Designed for the Internet of Things. The Vertices SDK provides developers with an easy way for devices to interact with Blockchains. Goals include having a C library, which can be included into C++ projects.",
+          "category": "Algorand IDEs",
+          "github": "https://github.com/vertices-network/c-vertices-sdk"
+        },
+        {
+          "name": "Unity Algorand SDK",
+          "description": "An SDK built for the Unity game engine. Connect to Algorand node services in your game. GitHub repo here:  https://github.com/CareBoo/unity-algorand-sdk",
+          "category": "Algorand IDEs",
+          "website": "https://assetstore.unity.com/packages/decentralization/infrastructure/algorand-sdk-247704"
+        },
+        {
+          "name": "ALGO Tables",
+          "description": "ALGO Tables is a suite of tools designed to aid everyday holders of ALGO who participate in the Algorand ecosystem. The site is hosted on Github and the code is open source. Furthermore, selected rows from tables can be exported in any traditional format for further analysis. Lastly, a number of charts can be modified by manipulating the tables and then refreshing the page.",
+          "category": "Algorand IDEs",
+          "website": "https://algotables.github.io/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/10/21/algotables.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Asalytic",
+          "description": "Asalytic is a powerful NFT analytics tool that helps users make a well-informed decision before purchasing their next NFT on the Algorand blockchain. The raw blockchain transactions are transformed into well-structured domain-specific objects, which are then converted into datasets. By using data visualization, statistics, and machine learning on those datasets we extend the customer’s knowledge about the NFT space. In Asalytic you can analyze the whole NFT space on Algorand, perform an in-depth collection analysis and you can do wallet tracking of all the active wallets in the NFT space.",
+          "category": "Algorand IDEs",
+          "website": "https://www.asalytic.app/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/10/21/asalytic.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "AWallet",
+          "description": "AWallet is open source community Algorand wallet with various features like payment gateway, payment terminal, governance tools, and vote coin voting system and others. AWallet is the first open source PWA wallet.",
+          "category": "Algorand IDEs",
+          "website": "https://www.a-wallet.net/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/02/08/awallet512x512.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Defly Wallet",
+          "description": "Defly is a secure Algorand wallet with advanced features you will love. It works well as a basic wallet but also offers unique features for DeFi trading. It contains very comprehensive market data streams, swaps get optimized by using liquidity across DEXs, and your DeFi positions are tracked (farming, staking, lending).",
+          "category": "Algorand IDEs",
+          "website": "https://defly.app/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/10/03/defly.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Lute",
+          "description": "Lute is an Algorand web wallet for Ledger hardware users. It allows for multiple accounts per Ledger, as well as accounts that are rekeyed to a Ledger.",
+          "category": "Algorand IDEs",
+          "website": "https://lute.app/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2024/02/07/lute_0wnC2dk.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Pera Wallet",
+          "description": "Pera is the most popular mobile wallet on the Algorand ecosystem. Hold, transact, and manage your assets all in one place, taking comfort in the fact that your private keys and data never leaves your phone. Interact with the Algorand Blockchain, earn rewards, connect with dApps, pair Ledger Nano X accounts, display your NFTs and buy or sell Algo with native integrations.",
+          "category": "Algorand IDEs",
+          "website": "https://perawallet.app/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/03/01/pera.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Algorand",
+          "description": "",
+          "category": "Algorand IDEs",
+          "website": "https://www.algorand.com/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2021/09/29/algorand_logo.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Algorand Foundation",
+          "description": "",
+          "category": "Algorand IDEs",
+          "website": "https://algorand.foundation/"
+        }
+      ],
+      "API Services and Infrastructure": [
+        {
+          "name": "YouTube",
+          "description": "Talks, developer office hours, and more",
+          "category": "API Services and Infrastructure",
+          "website": "https://www.youtube.com/algorand"
+        },
+        {
+          "name": "Dappflow",
+          "description": "Dappflow is a block explorer which can be connected to any node including your local sandbox private network.",
+          "category": "API Services and Infrastructure",
+          "website": "https://dappflow.org",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/07/22/dAppflow_logo.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "AiKON",
+          "description": "AIKON makes blockchain technology simple. We build cross-chain identity and wallet solutions on the ORE Network - so businesses don't have to..",
+          "category": "API Services and Infrastructure",
+          "website": "https://aikon.com/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/07/12/aikon.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Blockdaemon",
+          "description": "Blockdaemon allows you to orchestrate complex networks across multiple clouds and data centers without costly and time-consuming overhead.",
+          "category": "API Services and Infrastructure",
+          "website": "https://www.blockdaemon.com/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/07/12/Blockdaemon.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "bloq",
+          "description": "Building for DeFi, Mining, the Metaverse, and more. Infrastructure @ Applications for web3.",
+          "category": "API Services and Infrastructure",
+          "website": "https://bloq.com/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/07/12/bloq.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Chainalysis",
+          "description": "Chainalysis provide transparency for a global economy built on blockchains, enabling banks, business, and governments to have a common understanding of how people use cryptocurrency",
+          "category": "API Services and Infrastructure",
+          "website": "https://www.chainalysis.com/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/07/12/chainalysis.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Curvegrid",
+          "description": "Curvegrid's MultiBaas blockchain middleware makes it fast, easy, and cost effective for companies to build on multiple blockchain platforms.",
+          "category": "API Services and Infrastructure",
+          "website": "https://www.curvegrid.com/blog/curvegrid-algorand-partnership-nft-bridge-infrastructure",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/07/12/Curvegrid.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "PARSIQ",
+          "description": "PARSIQ is a blockchain monitoring and workflow platform connecting on-chain and off-chain applications in real-time.",
+          "category": "API Services and Infrastructure",
+          "website": "https://parsiq.net/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/07/12/Parsiq.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Alammex",
+          "description": "Alammex is a DEX aggregator that searches for quotes across many exchanges and combines them to give you the optimal deal. Alammex is a DEX aggregator for ASA swaps (to find and execute the best swap for the user). It currently leverages Tinyman, Algofi, and Pact. Alammex uses smart order routing to distribute a given swap across multiple exchanges to leverage all possible liquidity available in the market. Alammex will introduce two in-house protocols that will be added to the aggregator: 1. Arbitrage protocol: a fully decentralized, permissionless protocol for making multiple swaps atomically. This protocol leverages smart contract composability: with TEAL version 6, one smart contract can make inner transactions to other contracts (as long as they are composable). This protocol will be especially useful for swapping between assets that have low liquidity. 2. Order book protocol: a fully decentralized, permissionless protocol for making and taking limit orders.",
+          "category": "API Services and Infrastructure",
+          "website": "https://alammex.com",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/10/21/Alammex.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Ctrl Alt",
+          "description": "Ctrl Alt is a fintech company based in London that makes it simple, transparent and secure for anyone to invest in the previously exclusive world of alternative assets, from property to green energy and with as little as £10.",
+          "category": "API Services and Infrastructure",
+          "website": "http://www.ctrl-alt.co"
+        },
+        {
+          "name": "PolyMeta - NDFTrade",
+          "description": "NFTrade envisions building a platform with the foundation of a strong, interactive community for NFT enthusiasts to interact with each other build their collections. Additionally, NFTrade is working to build direct relationships with NFT artists to provide an exclusive platform to drop new and existing projects with the ability to directly engage with users through our community Discord server and Twitter followers.",
+          "category": "API Services and Infrastructure",
+          "website": "https://polymeta.co/"
+        },
+        {
+          "name": "Project Galapago",
+          "description": "Project Galapago is a fully decentralised, non-custodian NFT liquidity protocol that allows user to borrow crypto instantly using their NFTs and crypto as collateral.",
+          "category": "API Services and Infrastructure",
+          "website": "https://galapago.app"
+        },
+        {
+          "name": "Pyramidion Cryptocurrency",
+          "description": "A simple token with .01% SCIF (smart contract interaction fee)  which is simply how much PYRA is sent in a transaction X .0001 and migrates to the creator wallet (any transaction from any platform)..  A barter credit utility token (NETA) is provided. A barter credit utility token works like this.  We have a consensus on how much USD value a single PYRA token will hold.  If someone trades PYRA tokens for goods or services, they are not making a payment.  We take the fair market value of those goods or services and trade an equal amount of PYRA -  The fair market value of the goods and services are taxed as income for the goods and service receiver.  The receiver of the PYRA tokens now has a measured value to carry forward and complete another barter exchange.  Think of brokered business barter exchanges, but the point system has no intermediary and this is strictly for informal P2P trade, hence no exchanges.  We are collateralizing tokens P2P through barter exchange basically. Many possible use cases are listed in the LIGHTpaper on the site.",
+          "category": "API Services and Infrastructure",
+          "website": "http://www.pyra.world",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/02/08/Pyramidion.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Tree Certificates",
+          "description": "A significant problem with forest conservation and tree planting efforts is that there is currently no way to guarantee that a conserved forest or tree planted would continue to be in existence at some future time. Yet, credit is given at the time of tree planting or when a forest conservation action is taken. This sets up a perverse incentive for a tree planter to make no effort to conserve trees after payment has been received.",
+          "category": "API Services and Infrastructure",
+          "github": "https://github.com/alanmarko/TreeCertificates"
+        },
+        {
+          "name": "XBallot",
+          "description": "XBallot is an innovative DAO management solution that seamlessly blends governance and community forum in a single on-chain platform.",
+          "category": "API Services and Infrastructure",
+          "website": "https://xballot.net",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/07/11/xballot_r1lheJJ.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Bitquery",
+          "description": "Bitquery is a blockchain data company providing APIs and tools to explore blockchain data. Bitquery has built a scalable data infrastructure and provide more analytical and complex information through their tools and GraphQL APIs.",
+          "category": "API Services and Infrastructure",
+          "website": "https://explorer.bitquery.io/algorand"
+        },
+        {
+          "name": "Dappflow",
+          "description": "Dappflow is a block explorer which can be connected to any node including your local sandbox private network.",
+          "category": "API Services and Infrastructure",
+          "website": "https://dappflow.org",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2022/07/22/dAppflow_logo.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Dacade",
+          "description": "Dacade is a peer-to-peer education platform that enables social active learning: We make learning accessible, scalable and engaging. We believe in an open, user owned internet and an open financial system. To get there, we need to teach people how to develop applications that can drive this change. One of the biggest challenges on this way is the adoption and scalable education of new developers.",
+          "category": "API Services and Infrastructure",
+          "website": "https://dacade.org/"
+        },
+        {
+          "name": "OpenNFT",
+          "description": "Whitelabel NFT Marketplace by Ulam Labs. It allows you to introduce NFTs with a secure marketplace swiftly while equipping them with all the features you need. The solution is fast to deploy and endlessly customizable.",
+          "category": "API Services and Infrastructure",
+          "website": "https://www.ulam.io/case-studies/opennft-whitelabel-nft-marketplace/"
+        },
+        {
+          "name": "Flare",
+          "description": "A layer-1 protocol to enable secure, trustless interoperability between ALGO and BTC, plus other non-smart contract tokens such as DOGE, LTC, XRP and XLM.",
+          "category": "API Services and Infrastructure",
+          "website": "https://flare.network/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/06/07/Flare.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Tellor",
+          "description": "Tellor is a decentralized oracle protocol that incentivizes an open, permissionless network of data reporting and data validation, ensuring that data can be provided by anyone and checked by everyone.",
+          "category": "API Services and Infrastructure",
+          "website": "https://tellor.io/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/06/07/Tellor.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Wormhole",
+          "description": "The best way to build cross-chain. Harnessing the power of generic messaging and a single SDK, the Wormhole interoperability protocol makes cross-chain movement more feature-rich than ever. Explore more about how to grow your user base by going cross-chain.",
+          "category": "API Services and Infrastructure",
+          "website": "https://wormhole.com/"
+        },
+        {
+          "name": "Reach",
+          "description": "Write complex smart contracts in a JS-like language. Deploy to MainNet, TestNet or build and test locally with ease.",
+          "category": "API Services and Infrastructure",
+          "website": "https://reach.sh/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2021/09/29/reach_logo_-_Page_1.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Tealang",
+          "description": "C-like high-level language for ASC-1 with type safety, functions and packages/imports. The compiler generates TEAL or binary without using the goal clerk compiler.",
+          "category": "API Services and Infrastructure",
+          "github": "https://github.com/pzbitskiy/tealang"
+        },
+        {
+          "name": "Aikon ORE",
+          "description": "A universal authentication & authorization platform for blockchain. Works on web, mobile and legacy applications.",
+          "category": "API Services and Infrastructure",
+          "website": "https://aikon.com/ore-id",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/07/12/aikon.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Exodus",
+          "description": "Send, Receive, Stake, and Exchange With Exodus' Free and Secure ALGO Wallet",
+          "category": "API Services and Infrastructure",
+          "website": "https://www.exodus.com/algorand-wallet",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2021/09/29/exodus.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        }
+      ],
+      "Block Explorers": [
+        {
+          "name": "Allo’",
+          "description": "Allo.info is a blockchain explorer built to be more intuitive, easier to use, but still allow for more advanced ways to search the blockchain ledger.",
+          "category": "Block Explorers",
+          "website": "https://allo.info/"
+        },
+        {
+          "name": "Allo’",
+          "description": "Allo.info is a blockchain explorer built to be more intuitive, easier to use, but still allow for more advanced ways to search the blockchain ledger.",
+          "category": "Block Explorers",
+          "website": "https://allo.info/"
+        },
+        {
+          "name": "Glitter Finance",
+          "description": "Glitter Finance is a multinational company that specializes in the development of AI solutions to enable traders on the DeFi ecosystem to transfer their digital assets across various blockchain networks easily, without the assistance of middlemen or intermediaries.",
+          "category": "Block Explorers",
+          "website": "https://glitterfinance.org/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/06/07/Glitter.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        }
+      ],
+      "Smart Contract Utilities and Libraries": [
+        {
+          "name": "genpyteal",
+          "description": "Converts Python to PyTeal. It transpiles Python to PyTeal which is then used to output TEAL. The code is more maintainable since it uses regular Python control structures, etc. You can use a subset of Python. For scratch variables, you will need to initialize them at the beginning of a function, such as x = 0 or s = \"tom\". It uses that to determine the type. Sometimes you may need to specify Bytes or Int still. Integer/string literals get Int/Bytes added automatically. You can use print instead of Log. Name the main function app to indicate a stateful application contract, or sig for a LogicSig contract. For transaction fields, you can leave off the parenthesis, e.g. Txn.sender instead of Txn.sender(). It will assume functions return uint64 unless you specify at bytes or there is no return, which will automatically insert at Subroutine(TealType.none) If you want to print a number in the log, you can use the numtostr function I made.",
+          "category": "Smart Contract Utilities and Libraries",
+          "website": "https://pypi.org/project/genpyteal/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2021/09/29/pyteal.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "AlgoWorld Swapper",
+          "description": "A collection of ASC1 stateless smart contracts for performing single|multi ASA to ASA|ALGO swaps",
+          "category": "Smart Contract Utilities and Libraries",
+          "github": "https://github.com/AlgoWorldNFT/algoworld-swapper"
+        }
+      ],
+      "Uncategorized": [
+        {
+          "name": "Twitter",
+          "description": "Keep up with the latest news",
+          "category": "Uncategorized",
+          "website": "https://twitter.com/algorand"
+        },
+        {
+          "name": "Gitcoin bounties",
+          "description": "",
+          "category": "Uncategorized",
+          "website": "https://gitcoin.co/explorer?network=mainnet&idx_status=open&applicants=ALL&keywords=algodev&order_by=-web3_created&org=algorandfoundation"
+        },
+        {
+          "name": "Bleumi",
+          "description": "Bleumi is a first of its kind Payments Orchestration Platform built for fast-growing business owners to stay ahead on the forefront of customer payment preferences.",
+          "category": "Uncategorized",
+          "website": "https://www.facebook.com/BleumiInc/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/07/12/Bleumi.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "C3\n                            Decentralized markets with cross-chain settlement powered by a cross-",
+          "description": "margining clearing engine protocol.",
+          "category": "Uncategorized",
+          "website": "https://c3.io/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/07/12/c3.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Orion Protocol",
+          "description": "Orion protocol solves some of the largest issues in DeFi by aggregating the liquidity of the entire crypto market into one decentralized platform.",
+          "category": "Uncategorized",
+          "website": "https://www.orionprotocol.io/",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2023/07/12/Orion.jpg?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "vim TEAL plugin",
+          "description": "Syntax highlighting for TEAL scripts within vim.",
+          "category": "Uncategorized",
+          "github": "https://github.com/aldur/vim-algorand-teal",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2021/09/29/vim.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        },
+        {
+          "name": "Discord",
+          "description": "",
+          "category": "Uncategorized",
+          "website": "https://discord.gg/84AActu3at",
+          "logo": "https://algorand-devloper-portal-app.b-cdn.net/static/ecosystem-project-logos/2021/09/29/discord.png?w=160&cmd=resize_then_crop&height=160&quality=70"
+        }
+      ]
+    },
+    "summary": {
+      "totalProjects": 111,
+      "categories": [
+        "Create Publication",
+        "Algorand IDEs",
+        "API Services and Infrastructure",
+        "Block Explorers",
+        "Smart Contract Utilities and Libraries",
+        "Uncategorized"
+      ],
+      "projectsWithGithub": 20
+    }
+  }

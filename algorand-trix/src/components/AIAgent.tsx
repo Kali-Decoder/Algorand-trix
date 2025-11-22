@@ -5,11 +5,7 @@ import React, { useState, KeyboardEvent } from "react";
 import * as algokit from '@algorandfoundation/algokit-utils';
 import algosdk from "algosdk";
 import NFDRegistryAbi from "@/utils/NFD Registry arc32.json";
-type MintResult = {
-  txId: string;
-  confirmedRound: number | null;
-  returnedAppId?: bigint | null; // if contract returns the new NFD app id (may be available in logs/return)
-};
+
 
 import {
   accountabstraction,
@@ -88,55 +84,74 @@ export default function AIAgent() {
   ) => {
     try {
       if (!activeAddress) throw new Error("[App] No active account");
-      
-      const algorand = algokit.AlgorandClient.testNet();
-      algorand.setDefaultSigner(transactionSigner);
+      if (!algodClient) throw new Error("[App] Algod client not available");
 
+      // Load ABI and find the mint method
       const registryAbi: any = NFDRegistryAbi;
-      if (!registryAbi) {
-        throw new Error("Registry ABI not found. Please ensure NFD Registry arc32.json is properly imported.");
+      if (!registryAbi) throw new Error("Registry ABI not found. Please ensure NFD Registry arc32.json is imported.");
+  
+      const mintMethodAbi = registryAbi.contract?.methods?.find((m: any) => m.name === "mintNfd");
+      if (!mintMethodAbi) throw new Error("mintNfd method not found in registry ABI.");
+
+      // Prepare suggested params
+      const suggestedParams = await algodClient.getTransactionParams().do();
+  
+      // Build payment txn from buyer -> registry address
+      const totalPayment = BigInt(priceMicroAlgos) + BigInt(carryMicroAlgos);
+  
+      // Safety: ensure amount fits into JS Number for algosdk helper (if > 2^53-1, adapt to raw signing)
+      if (totalPayment > BigInt(Number.MAX_SAFE_INTEGER)) {
+        throw new Error("[mintNfdName] totalPayment exceeds JS safe integer. Use raw signing that supports BigInt amounts.");
       }
   
-      // find mintNfd method object
-      const mintMethod = registryAbi.methods?.find((m: any) => m.name === "mintNfd");
-      if (!mintMethod) throw new Error("mintNfd method not found in registry ABI.");
+      const paymentTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+        sender: activeAddress,
+        receiver: registryAddress,
+        amount: Number(totalPayment),
+        suggestedParams,
+      });
+      
+      // Construct the ABIMethod instance
+      const mintNfdAbiMethod = new algosdk.ABIMethod(mintMethodAbi);
+      
+      // Get method selector (first 4 bytes of method signature hash)
+      const methodSelector = mintNfdAbiMethod.getSelector();
+      
+      // Encode method arguments manually
+      // Note: For the payment transaction (txn type), we'll need to pass it in the transaction group
+      // For now, encode the other arguments: nfdName (string), reservedFor (address), linkOnMint (bool)
+      const encodedArgs: Uint8Array[] = [];
+      
+      // Encode nfdName (string)
+      const nameBytes = new TextEncoder().encode(nfdName);
+      const nameLength = algosdk.encodeUint64(nameBytes.length);
+      encodedArgs.push(nameLength);
+      encodedArgs.push(nameBytes);
+      
+      // Encode reservedFor (address - 32 bytes)
+      const reservedForBytes = algosdk.decodeAddress(reservedFor).publicKey;
+      encodedArgs.push(reservedForBytes);
+      
+      // Encode linkOnMint (bool - uint8: 0 or 1)
+      encodedArgs.push(new Uint8Array([linkOnMint ? 1 : 0]));
+      
+      // Combine selector with encoded args
+      const appArgs = [methodSelector, ...encodedArgs];
+      
+      console.log("Method selector:", methodSelector);
+      console.log("Encoded args:", encodedArgs);
+      console.log("App args:", appArgs);
+
+
   
-      // Prepare suggested params
-      // const algodClient = algorand.algodClient; // algokit client exposes raw algod — adapt if different
-      // const suggestedParams = await algodClient.getTransactionParams().do();
+   
   
-      // // 1) Build Payment txn (buyer -> registry address)
-      // const totalPayment = BigInt(priceMicroAlgos) + BigInt(carryMicroAlgos); // microAlgos
-      // const paymentTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-      //   from: activeAddress,
-      //   to: registryAddress,
-      //   amount: Number(totalPayment), // algosdk expects number; ensure it fits JS number. For >53-bit use raw signing.
-      //   suggestedParams,
-      // });
-  
-      // // 2) Encode ABI method call
-      // // algosdk's encodeMethodCall requires a Method object — easiest is to construct the object manually.
-      // // We'll convert the ABI method to algosdk Method instance:
-      // const method = new algosdk.Method({
-      //   name: mintMethod.name,
-      //   args: mintMethod.args.map((a: any) => ({ name: a.name, type: a.type })),
-      //   returns: mintMethod.returns ? { type: mintMethod.returns.type } : undefined,
-      // });
-  
-      // // The mintNfd ABI expects the `purchaseTxn` as type "pay" (a payment txn object in the group)
-      // // For ABI encoding we pass a placeholder for purchaseTxn: with algosdk.encodeMethodCall the ABI encoder
-      // // will expect the group index to contain the payment transaction at the right position automatically.
-      // // algosdk.encodeMethodCall supports 'txns' as part of the encoded params — we will provide purchase txn as
-      // // a special argument using the `txn` ABI type. The helper below uses algosdk.encodeUnsignedTransaction for that.
-      // //
-      // // Build the encoded call via algosdk:
+      // // Encode ABI method call. For the ABI, the first arg is a "pay" (txn) argument (the purchase txn).
+      // // algosdk.encodeMethodCall supports passing Transaction objects as methodArgs for "pay"/"txn" args.
       // const abiEncode = algosdk.encodeMethodCall({
       //   method,
-      //   // method args must match ABI order: [purchaseTxn(pay), nfdName(string), reservedFor(address), linkOnMint(bool)]
       //   methodArgs: [
-      //     // For a 'pay' arg, we must pass the actual payment transaction as a SignedTxn? In practice with algosdk,
-      //     // encodeMethodCall supports passing a Transaction object to be placed into the group as a "txn" arg.
-      //     // We'll pass the paymentTxn object; algosdk will return `appArgs`, `accounts`, `foreignApps`, `foreignAssets`, and `txns` placeholders.
+      //     // pass the payment txn object — encodeMethodCall will create the appropriate `txns` placeholders
       //     paymentTxn,
       //     nfdName,
       //     reservedFor,
@@ -145,46 +160,80 @@ export default function AIAgent() {
       //   sender: activeAddress,
       // });
   
-      // // 3) Create the application call transaction (NoOp) with the encoded ABI call data
+      // // Create the application call (NoOp) with encoded ABI bytes and any foreign arrays returned by encodeMethodCall.
+      // // encodeMethodCall returns: appArgs (array of Uint8Array), accounts, foreignApps, foreignAssets, and txns placeholders.
       // const appCallTxn = algosdk.makeApplicationCallTxnFromObject({
       //   from: activeAddress,
       //   appIndex: registryAppId,
-      //   appArgs: abiEncode.appArgs,          // raw method selector + args
-      //   accounts: abiEncode.accounts || [],
-      //   foreignApps: abiEncode.foreignApps || [],
-      //   foreignAssets: abiEncode.foreignAssets || [],
+      //   onComplete: algosdk.OnApplicationComplete.NoOpOC,
+      //   appArgs: abiEncode?.appArgs || [],
+      //   accounts: abiEncode?.accounts || [],
+      //   foreignApps: abiEncode?.foreignApps || [],
+      //   foreignAssets: abiEncode?.foreignAssets || [],
       //   suggestedParams,
       // });
   
-      // // 4) Group them: IMPORTANT: payment must come BEFORE the appCall (index order)
+      // // Group transactions: payment must be first, then app call (as the ABI expects the payment to be present in group)
       // const txns = [paymentTxn, appCallTxn];
-      // const groupId = algosdk.computeGroupID(txns as unknown as algosdk.Transaction[]); // compute group id
-      // for (let t of txns) (t as any).group = groupId;
+      // const groupId = algosdk.computeGroupID(txns as unknown as algosdk.Transaction[]);
+      // for (const t of txns) (t as any).group = groupId;
   
-      // // 5) Sign transactions (use algokit transactionSigner like in your other helpers)
-      // // If your transactionSigner is set as the default signer in algorand client,
-      // // you can use algorand.signTransaction? But to match your other functions, we sign locally:
-      // const signedPayment = await transactionSigner(activeAddress, paymentTxn.toByte()); // adapt to your signer API
-      // const signedAppCall = await transactionSigner(activeAddress, appCallTxn.toByte()); // adapt
+      // // Serialize unsigned txns to raw bytes for signer
+      // const unsignedTxnBytes = txns.map((t) => {
+      //   return t.toByte();
+      // });
   
-      // // If transactionSigner returns raw signed tx bytes, use them directly; else adjust as needed.
-      // const signedTxns = [signedPayment, signedAppCall];
+      // // Sign transactions using your transactionSigner. Adapt if your signer API is different.
+      // // Expected: transactionSigner(account, unsignedTxnBytes[i]) => Promise<Uint8Array>
+      // const signedTxns: Uint8Array[] = [];
+      // for (let i = 0; i < unsignedTxnBytes.length; i++) {
+      //   // transactionSigner might accept (address, txnBytes) and return signed bytes.
+      //   const signed = await transactionSigner(activeAddress, unsignedTxnBytes[i]);
+      //   // If the signer returns an object (e.g., {signedTxn}), adapt. We assume Uint8Array/Buffer here.
+      //   if (!signed) throw new Error("transactionSigner returned empty value. Check signer implementation.");
+      //   // normalize Buffer -> Uint8Array if needed
+      //   const signedBytes = signed instanceof Uint8Array ? signed : new Uint8Array(signed);
+      //   signedTxns.push(signedBytes);
+      // }
   
-      // // 6) Submit
-      // const { txId } = await algodClient.sendRawTransaction(signedTxns).do();
+      // // Submit concatenated signed txns
+      // // concatenate into single Uint8Array
+      // const totalLen = signedTxns.reduce((acc, b) => acc + b.length, 0);
+      // const combined = new Uint8Array(totalLen);
+      // let offset = 0;
+      // for (const b of signedTxns) {
+      //   combined.set(b, offset);
+      //   offset += b.length;
+      // }
   
-      // // 7) Wait for confirmation
-      // const confirmed = await algorand.waitForConfirmation(txId, 4); // helper on algokit client — adapt as needed
+      // const { txId } = await algodClient.sendRawTransaction(combined).do();
   
-      // // Optionally parse returned value (if contract returns the new NFD app id)
-      // // The contract returns a uint64 on success — you may find it in the application call return or logs.
-      // // Parsing return value is a bit involved — for now we'll return txId + confirmed round.
+      // // Wait for confirmation (you used algokit helper in other code — use that if available)
+      // // Here we use a small helper that polls until confirmed (simple).
+      // const waitForConfirmation = async (client: any, txIdStr: string, timeout = 10) => {
+      //   const startRoundResp = await client.status().do();
+      //   let currentRound = startRoundResp["last-round"] + 1;
+      //   for (let i = 0; i < timeout; i++) {
+      //     const pending = await client.pendingTransactionInformation(txIdStr).do();
+      //     if (pending && pending["confirmed-round"] && pending["confirmed-round"] > 0) {
+      //       return pending;
+      //     }
+      //     await client.statusAfterBlock(currentRound).do();
+      //     currentRound++;
+      //   }
+      //   throw new Error("Transaction not confirmed after timeout");
+      // };
+  
+      // const confirmed = await waitForConfirmation(algodClient, txId, 30);
+  
+      // // Optionally: decode return value if the method returns something.
+      // // The ARC32 may return a uint64 in the application call's inner transactions / logs.
+      // // For now return txId + confirmedRound and the raw pending info for further parsing.
       // return {
       //   txId,
-      //   confirmedRound: confirmed?.confirmedRound ?? null,
-      //   returnedAppId: null,
+      //   confirmedRound: confirmed?.["confirmed-round"] ?? null,
+      //   pendingInfo: confirmed,
       // };
-
     } catch (err) {
       console.error("❌ Error minting NFD:", err);
       throw err;
@@ -234,10 +283,6 @@ export default function AIAgent() {
       throw err;
     }
   };
-
-
-
-
 
   const algoDirectPayment = async (receiver: string, amount: number) => {
     try {
@@ -1286,13 +1331,219 @@ export default function AIAgent() {
     });
   };
 
-  // Handles the "ecosystem-project" flow.
-  const handleEcosystemProjectSubmit = async (currentInput: string) => {
-    return await fetch("/api/ecosystem-projects", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: currentInput }),
-    });
+  // Format ecosystem projects response for display as HTML cards
+  const formatEcosystemProjectsResponse = (data: any): string => {
+    if (!data || !data.data) {
+      return `<div style="color: #ef4444; padding: 1rem;">❌ No data available</div>`;
+    }
+
+    // Helper function to create a project card
+    const createProjectCard = (project: any): string => {
+      const cardStyle = `background: linear-gradient(135deg, rgba(33, 33, 33, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%); border: 1px solid rgba(107, 114, 128, 0.2); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);`;
+      
+      let card = `<div style="${cardStyle}">`;
+      
+      // Project name
+      if (project.name) {
+        card += `<div style="color: #ffffff; font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 0.25rem 0.75rem; border-radius: 0.5rem; font-size: 0.875rem; color: white;">${project.category || 'Project'}</span>
+          <span>${project.name}</span>
+        </div>`;
+      }
+      
+      // Description
+      if (project.description) {
+        const truncatedDesc = project.description.length > 300 
+          ? project.description.substring(0, 300) + '...' 
+          : project.description;
+        // Escape HTML in description
+        const safeDesc = truncatedDesc.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        card += `<div style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; margin-bottom: 1rem;">${safeDesc}</div>`;
+      }
+      
+      // Links
+      const links: string[] = [];
+      if (project.website) {
+        links.push(`<a href="${project.website}" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; text-decoration: none; font-size: 0.875rem; margin-right: 1rem; display: inline-flex; align-items: center; gap: 0.25rem;">🌐 Website</a>`);
+      }
+      if (project.github) {
+        links.push(`<a href="${project.github}" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; text-decoration: none; font-size: 0.875rem; margin-right: 1rem; display: inline-flex; align-items: center; gap: 0.25rem;">💻 GitHub</a>`);
+      }
+      
+      if (links.length > 0) {
+        card += `<div style="display: flex; flex-wrap: wrap; gap: 0.5rem; padding-top: 0.75rem; border-top: 1px solid rgba(107, 114, 128, 0.2);">${links.join('')}</div>`;
+      }
+      
+      card += `</div>`;
+      return card;
+    };
+
+    let htmlContent = '';
+    const responseText = data.data || '';
+    
+    // If we have structured projects data, use it
+    if (data.projects && Array.isArray(data.projects) && data.projects.length > 0) {
+      // Group projects by category if projectsByCategory exists
+      if (data.projectsByCategory) {
+        Object.keys(data.projectsByCategory).forEach((category: string) => {
+          const categoryProjects = data.projectsByCategory[category];
+          
+          // Category header
+          htmlContent += `<div style="margin-top: 2rem; margin-bottom: 1rem;">
+            <h3 style="color: #ffffff; font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid rgba(99, 102, 241, 0.3); display: flex; align-items: center; gap: 0.5rem;">
+              <span style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 0.25rem 0.75rem; border-radius: 0.5rem; font-size: 0.875rem;">📂</span>
+              ${category}
+            </h3>
+          </div>`;
+          
+          // Render project cards for this category
+          categoryProjects.slice(0, 10).forEach((project: any) => {
+            htmlContent += createProjectCard({ ...project, category });
+          });
+        });
+      } else {
+        // Single category or search results
+        if (data.category) {
+          htmlContent += `<div style="margin-top: 1rem; margin-bottom: 1rem;">
+            <h3 style="color: #ffffff; font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid rgba(99, 102, 241, 0.3); display: flex; align-items: center; gap: 0.5rem;">
+              <span style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 0.25rem 0.75rem; border-radius: 0.5rem; font-size: 0.875rem;">📂</span>
+              ${data.category}
+            </h3>
+          </div>`;
+        }
+        
+        // Render all project cards
+        data.projects.forEach((project: any) => {
+          htmlContent += createProjectCard(project);
+        });
+        
+        if (data.totalCount && data.showingCount && data.totalCount > data.showingCount) {
+          htmlContent += `<div style="color: #9ca3af; font-size: 0.875rem; margin-top: 1rem; padding: 1rem; background: rgba(107, 114, 128, 0.1); border-radius: 0.5rem;">
+            Showing ${data.showingCount} of ${data.totalCount} projects. Search for a specific project to see more.
+          </div>`;
+        }
+      }
+      
+      // Add header text if available
+      if (responseText) {
+        const headerText = responseText.split('\n\n')[0]; // Get first paragraph
+        htmlContent = `<div style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; margin-bottom: 1.5rem;">${headerText.replace(/\*\*(.*?)\*\*/g, '<strong style="color: #ffffff;">$1</strong>')}</div>` + htmlContent;
+      }
+    } else {
+      // Fallback: convert markdown to HTML if no structured data
+      let converted = responseText
+        .replace(/\*\*(.*?)\*\*/g, '<strong style="color: #ffffff; font-weight: 700;">$1</strong>')
+        .replace(/### (.*?)\n/g, '<h3 style="color: #ffffff; font-size: 1.25rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid rgba(99, 102, 241, 0.3);">$1</h3>')
+        .replace(/\n\n/g, '</p><p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; margin-bottom: 0.75rem;">')
+        .replace(/\n/g, '<br>');
+      
+      htmlContent = `<div style="background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(31, 41, 55, 0.95) 100%); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1rem;"><p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; margin-bottom: 0.75rem;">${converted}</p></div>`;
+    }
+    
+    // Add follow-up question card
+    htmlContent += `<div style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 0.75rem; padding: 1rem; margin-top: 1rem;">
+      <p style="color: #ffffff; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.875rem;">💬 <strong>Do you need anything else?</strong></p>
+      <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; margin: 0;">
+        I can help you with finding more projects, exploring specific categories, getting project details, or anything else about the Algorand ecosystem!
+      </p>
+    </div>`;
+    
+    // Ensure HTML starts with < immediately (no whitespace) for ResponseDisplay to recognize it
+    return htmlContent.trim();
+  };
+
+  const handleEcosystemProjectSubmit = async (
+    currentInput: string,
+    setMessages: (fn: (prev: any[]) => any[]) => void
+  ) => {
+    const lowerInput = currentInput.toLowerCase().trim();
+    const input = currentInput.trim();
+    
+    // Handle empty input
+    if (!input || input.length === 0) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "👋 I can help you explore Algorand ecosystem projects! What would you like to know?\n\n" +
+                   "Try asking:\n" +
+                   "- \"How many projects are there?\"\n" +
+                   "- \"List all categories\"\n" +
+                   "- \"Show me projects in [category]\"\n" +
+                   "- \"Find [project name]\"\n" +
+                   "- \"Projects with GitHub\"",
+        },
+      ]);
+      return null;
+    }
+
+    // Detect greetings
+    const greetings = ['hi', 'hello', 'hey', 'greetings', 'good morning', 'good afternoon', 'good evening', 'howdy'];
+    const isGreeting = greetings.some(greeting => lowerInput.startsWith(greeting) || lowerInput === greeting);
+    
+    if (isGreeting) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "👋 Hello! Welcome to Algorand Ecosystem Projects!\n\n" +
+                   "I can help you explore and discover projects in the Algorand ecosystem. Here's what you can ask me:\n\n" +
+                   "• **\"How many projects are there?\"** - Get the total count and breakdown\n" +
+                   "• **\"List all categories\"** - See all available categories\n" +
+                   "• **\"Show me projects in [category]\"** - Browse projects by category\n" +
+                   "• **\"Find [project name]\"** - Search for a specific project\n" +
+                   "• **\"Projects with GitHub\"** - See open source projects\n\n" +
+                   "What would you like to explore? 🚀",
+        },
+      ]);
+      return null;
+    }
+ 
+    try {
+      const response = await fetch("/api/ecosystem-projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: currentInput }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.error) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: `❌ Error: ${data.error}\n\n` +
+                     `Is there anything else you'd like to know about Algorand ecosystem projects?`,
+          },
+        ]);
+        return null;
+      }
+      
+      // Format the response as HTML cards
+      const formattedContent = formatEcosystemProjectsResponse(data);
+      
+      // Add the formatted response to messages
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: formattedContent,
+        },
+      ]);
+      
+      return null; // Return null since we handled the message internally
+    } catch (error: any) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: `❌ Failed to fetch ecosystem projects data. Please try again.\n\n` +
+                   `Is there anything else I can help you with?`,
+        },
+      ]);
+      return null;
+    }
   };
 
   // Handles the "nfd-names" flow.
@@ -1488,7 +1739,7 @@ export default function AIAgent() {
           try {
             // For now, using placeholder values - you may want to fetch these from the registry
             // You might need to call getPrice() method from the registry contract
-            const registryAppId = 763844423; // Testnet registry app ID - you may want to make this configurable
+            const registryAppId = 84366825;
             const registryAddress = "RSV2YCHXA7MWGFTX3WYI7TVGAS5W5XH5M7ZQVXPPRQ7DNTNW36OW2TRR6I"; // Testnet registry address - you may want to make this configurable
             const priceMicroAlgos = BigInt(1000000); // 1 ALGO in microAlgos - should be fetched from registry
             const carryMicroAlgos = BigInt(100000); // 0.1 ALGO - should be calculated based on MBR
@@ -2378,7 +2629,8 @@ const ${name} = async (${paramNames}) => {
           response = await handleAlgorandHelperSubmit(currentInput, setMessages);
           break;
         case "ecosystem-project":
-          response = await handleEcosystemProjectSubmit(currentInput);
+          response = await handleEcosystemProjectSubmit(currentInput, setMessages);
+          if (!response) return; // Early return if flow is handled internally
           break;
         case "nfd-names":
           response = await handleNFDNamesSubmit(currentInput, setMessages);
@@ -2531,7 +2783,7 @@ const ${name} = async (${paramNames}) => {
             />
             Algorand TRIX
           </h1>
-          <div className="transform transition-all duration-300 hover:scale-105 mt-4">
+          <div className="mt-4">
             <Connect />
           </div>
         </div>
@@ -2544,7 +2796,7 @@ const ${name} = async (${paramNames}) => {
           </div>
         )} */}
 
-        <div className="space-y-2 flex-1">
+        <div className="space-y-2 flex-1 overflow-y-auto min-h-0">
           <h3 className="text-xs uppercase text-gray-400/70 mb-3 font-semibold tracking-wider">
             Features
           </h3>
@@ -2720,7 +2972,7 @@ const ${name} = async (${paramNames}) => {
                   }`}
               >
                 <div
-                  className={`flex items-start gap-4 max-w-4xl ${message.role === "assistant"
+                  className={`flex items-start gap-4 max-w-4xl text-sm ${message.role === "assistant"
                     ? "bg-[#212121] backdrop-blur-sm border border-gray-500/10"
                     : "bg-indigo-400 text-black font-bold"
                     } p-5 rounded-2xl shadow-lg transition-all duration-500 hover:shadow-gray-500/20`}

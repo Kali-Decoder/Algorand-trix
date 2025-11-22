@@ -3,11 +3,13 @@ import React, { useState, useEffect } from "react";
 import { useWallet, type Wallet } from "@txnlab/use-wallet-react";
 import { Modal } from "@/components/WalletModal";
 import { Button } from "@/components/ui/button";
+import { Copy, Check } from "lucide-react";
 
 export function Connect() {
   const { algodClient, activeAddress, wallets } = useWallet();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [balance, setBalance] = useState<number | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const handleConnect = () => {
     console.log('Connect button clicked, opening modal...');
@@ -25,13 +27,30 @@ export function Connect() {
     setIsModalOpen(false);
   };
 
+  const handleCopyAddress = async () => {
+    if (activeAddress) {
+      try {
+        await navigator.clipboard.writeText(activeAddress);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy address:', err);
+      }
+    }
+  };
+
   useEffect(() => {
     const fetchBalance = async () => {
-      if (activeAddress) {
-        const accountInfo = await algodClient
-          .accountInformation(activeAddress)
-          .do();
-        setBalance(Number(accountInfo.amount) / 1_000_000);
+      if (activeAddress && algodClient) {
+        try {
+          const accountInfo = await algodClient
+            .accountInformation(activeAddress)
+            .do();
+          setBalance(Number(accountInfo.amount) / 1_000_000);
+        } catch (error) {
+          console.error('Failed to fetch balance:', error);
+          setBalance(null);
+        }
       } else {
         setBalance(null);
       }
@@ -42,42 +61,61 @@ export function Connect() {
   return (
     <>
       {activeAddress ? (
-        <div className="flex items-center">
+        <div className="w-full">
           <Button
             onClick={handleDisconnect}
             variant="outline"
-            className="flex items-center bg-transparent text-white gap-3 px-4 py-2"
+            className="w-full flex items-center justify-between bg-transparent text-white gap-2 px-3 py-2 border-gray-500/20 "
           >
-            {/* Green dot */}
-            <div className="w-2 h-2 rounded-full bg-green-500" />
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              {/* Green dot */}
+              <div className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
 
-            {/* Address */}
-            <span className="font-medium">
-              {activeAddress.slice(0, 4)}...{activeAddress.slice(-4)}
-            </span>
+              {/* Address */}
+              <span className="font-medium text-xs truncate">
+                {activeAddress.slice(0, 4)}...{activeAddress.slice(-4)}
+              </span>
 
-            {/* Divider */}
-            <span className="text-gray-300">|</span>
+              {/* Divider */}
+              <span className="text-gray-300 flex-shrink-0 text-xs">|</span>
 
-            {/* Balance */}
-            <span className="text-sm text-white">
-              {balance !== null ? `${balance.toFixed(2)} ALGO` : "Loading..."}
-            </span>
+              {/* Balance */}
+              <span className="text-xs text-white truncate">
+                {balance !== null ? `${balance.toFixed(2)} ALGO` : "Loading..."}
+              </span>
+            </div>
+
+            {/* Copy Button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleCopyAddress();
+              }}
+              className="p-1.5 rounded-lg bg-gray-500/20 text-white transition-all duration-200 border border-gray-500/20 hover:border-gray-500/40 flex-shrink-0"
+              title="Copy wallet address"
+              aria-label="Copy wallet address"
+            >
+              {copied ? (
+                <Check size={14} className="text-green-400" />
+              ) : (
+                <Copy size={14} />
+              )}
+            </button>
           </Button>
         </div>
 
       ) : (
-        <div className="mt-4">
+        <div className="w-full">
           <Button
             onClick={handleConnect}
-            className="flex items-center gap-2 px-6 py-2"
+            className="flex items-center gap-2 px-6 py-2 w-full"
           >
             <svg
               width="16"
               height="16"
               viewBox="0 0 24 24"
               fill="none"
-              className="mr-1"
+              className="flex-shrink-0"
             >
               <path
                 d="M21 18V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3H19C20.1 3 21 3.9 21 5V6H12C10.9 6 10 6.9 10 8V16C10 17.1 10.9 18 12 18H21ZM12 16H22V8H12V16ZM16 13.5C15.17 13.5 14.5 12.83 14.5 12C14.5 11.17 15.17 10.5 16 10.5C16.83 10.5 17.5 11.17 17.5 12C17.5 12.83 16.83 13.5 16 13.5Z"
@@ -231,7 +269,7 @@ function WalletList({ onClose }: { onClose: () => void }) {
                     ? 'border-blue-300 bg-blue-50 cursor-wait'
                     : isConnected
                       ? 'border-green-300 bg-green-50 cursor-default'
-                      : 'border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50 hover:shadow-md cursor-pointer'
+                      : 'border-gray-200 bg-white hover:border-blue-400  hover:shadow-md cursor-pointer'
                 }
                 disabled:opacity-75 disabled:cursor-not-allowed
               `}
@@ -245,7 +283,7 @@ function WalletList({ onClose }: { onClose: () => void }) {
                     ? 'bg-blue-100'
                     : isConnected
                       ? 'bg-green-100'
-                      : 'bg-gray-100 group-hover:bg-blue-100'
+                      : 'bg-gray-100 '
                 }
               `}>
                 <img

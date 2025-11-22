@@ -98,7 +98,7 @@ export default function ResponseDisplay({ response, isLoading = false }: Respons
   if (response.imageSrc) {
     return (
       <div className="flex flex-col items-start space-y-4 transition-all duration-500">
-        <p className="text-gray-200">{response.text}</p>
+        <p className="text-gray-200 text-sm">{response.text}</p>
         <div className="relative group">
           <div className="absolute -inset-0.5 bg-gradient-to-r from-gray-500 to-gray-700 rounded-lg blur opacity-50 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse" />
           <div className="relative">
@@ -109,9 +109,9 @@ export default function ResponseDisplay({ response, isLoading = false }: Respons
             />
           </div>
         </div>
-        <div className="flex items-center justify-center space-x-2 bg-gray-800/80 rounded-md px-4 py-2 text-sm border border-gray-700">
-          <CircleOff size={16} className="text-gray-400" />
-          <p className="text-gray-200">Ready to mint as NFT</p>
+        <div className="flex items-center justify-center space-x-2 bg-gray-800/80 rounded-md px-4 py-2 text-xs border border-gray-700">
+          <CircleOff size={14} className="text-gray-400" />
+          <p className="text-gray-200 text-xs">Ready to mint as NFT</p>
         </div>
       </div>
     );
@@ -119,16 +119,18 @@ export default function ResponseDisplay({ response, isLoading = false }: Respons
 
   // Final rendered content
   return (
-    <div className="text-gray-200 rounded-lg transition-all duration-500 prose prose-invert max-w-none">
+    <div className="text-gray-200 text-sm rounded-lg transition-all duration-500 prose prose-invert prose-sm max-w-none">
       {isHTML ? (
-        <div dangerouslySetInnerHTML={{ __html: response }} />
+        <div className="text-sm" dangerouslySetInnerHTML={{ __html: response }} />
       ) : (
         <>
-          <ReactMarkdown rehypePlugins={[rehypeRaw]}>
-            {displayedText}
-          </ReactMarkdown>
+          <div className="text-sm">
+            <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+              {displayedText}
+            </ReactMarkdown>
+          </div>
           {!isComplete && (
-            <span className="inline-block w-2 h-4 ml-1 bg-gray-400 animate-pulse" />
+            <span className="inline-block w-2 h-3 ml-1 bg-gray-400 animate-pulse" />
           )}
         </>
       )}
