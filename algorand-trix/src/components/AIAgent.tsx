@@ -500,7 +500,7 @@ export default function AIAgent() {
     step: "address" | "view" | "confirm" | "name" | "reservedFor" | "linkOnMint";
     address?: string;
     view?: string;
-    operation?: "getAllNfds" | "reverseLookup" | "resolveName" | "mintNfd";
+    operation?: "getAllNfds" | "reverseLookup" | "resolveAddress" | "mintNfd";
     nfdName?: string;
     reservedFor?: string;
     linkOnMint?: boolean;
@@ -1555,28 +1555,125 @@ export default function AIAgent() {
     const lowerInput = currentInput.toLowerCase().trim();
     const input = currentInput.trim();
     
+    // Check for greetings
+    const greetings = ['hi', 'hello', 'hey', 'hi there', 'hello there', 'hey there', 'greetings', 'hey trix'];
+    const isGreeting = greetings.some(greeting => lowerInput === greeting || lowerInput.startsWith(greeting + ' '));
+    
+    if (isGreeting && !pendingNFDLookup) {
+      const greetingContent = `
+        <div style="color: #e5e7eb; font-size: 1rem; line-height: 1.6;">
+          <div style="margin-bottom: 1.5rem;">
+            <h2 style="color: #ffffff; font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>👋</span>
+              <span>Hey! How can I help you with NFD?</span>
+            </h2>
+            <p style="color: #9ca3af; font-size: 0.9rem;">Here are the operations I can help you with:</p>
+          </div>
+          
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <!-- Operation 1 -->
+            <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 0.75rem; padding: 1.25rem; transition: all 0.3s;">
+              <div style="display: flex; align-items: start; gap: 0.75rem;">
+                <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 0.5rem; border-radius: 0.5rem; font-size: 1.25rem; line-height: 1;">
+                  📋
+                </div>
+                <div style="flex: 1;">
+                  <h3 style="color: #ffffff; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">
+                    Get All NFD Names
+                  </h3>
+                  <p style="color: #d1d5db; font-size: 0.875rem; margin-bottom: 0.75rem; line-height: 1.5;">
+                    Get all NFD names associated with an address
+                  </p>
+                  <div style="background: rgba(0, 0, 0, 0.3); border-left: 3px solid #6366f1; padding: 0.5rem 0.75rem; border-radius: 0.375rem; font-size: 0.8rem; color: #9ca3af; font-family: 'Courier New', monospace;">
+                    💬 Example: "get all nfd names for ABC123..."
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Operation 2 -->
+            <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 0.75rem; padding: 1.25rem; transition: all 0.3s;">
+              <div style="display: flex; align-items: start; gap: 0.75rem;">
+                <div style="background: linear-gradient(135deg, #22c55e 0%, #3b82f6 100%); padding: 0.5rem; border-radius: 0.5rem; font-size: 1.25rem; line-height: 1;">
+                  🔍
+                </div>
+                <div style="flex: 1;">
+                  <h3 style="color: #ffffff; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">
+                    Resolve Address
+                  </h3>
+                  <p style="color: #d1d5db; font-size: 0.875rem; margin-bottom: 0.75rem; line-height: 1.5;">
+                    Resolve an address to get its primary NFD name(s)
+                  </p>
+                  <div style="background: rgba(0, 0, 0, 0.3); border-left: 3px solid #22c55e; padding: 0.5rem 0.75rem; border-radius: 0.375rem; font-size: 0.8rem; color: #9ca3af; font-family: 'Courier New', monospace;">
+                    💬 Example: "resolve address ABC123..."
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Operation 3 -->
+            <div style="background: linear-gradient(135deg, rgba(251, 146, 60, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%); border: 1px solid rgba(251, 146, 60, 0.3); border-radius: 0.75rem; padding: 1.25rem; transition: all 0.3s;">
+              <div style="display: flex; align-items: start; gap: 0.75rem;">
+                <div style="background: linear-gradient(135deg, #fb923c 0%, #ec4899 100%); padding: 0.5rem; border-radius: 0.5rem; font-size: 1.25rem; line-height: 1;">
+                  🔄
+                </div>
+                <div style="flex: 1;">
+                  <h3 style="color: #ffffff; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">
+                    Reverse Lookup
+                  </h3>
+                  <p style="color: #d1d5db; font-size: 0.875rem; margin-bottom: 0.75rem; line-height: 1.5;">
+                    Reverse lookup an NFD name to get its address
+                  </p>
+                  <div style="background: rgba(0, 0, 0, 0.3); border-left: 3px solid #fb923c; padding: 0.5rem 0.75rem; border-radius: 0.375rem; font-size: 0.8rem; color: #9ca3af; font-family: 'Courier New', monospace;">
+                    💬 Example: "reverse lookup myname.algo"
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: greetingContent,
+        },
+      ]);
+      setLoading(false);
+      return null;
+    }
+    
     // Determine operation type based on input
-    type OperationType = "getAllNfds" | "resolveName" | "reverseLookup" | null;
+    type OperationType = "getAllNfds" | "resolveAddress" | "reverseLookup" | null;
     let operationType: OperationType = null;
     
-    // Check if user wants to get all NFDs
-    const wantsAllNfds = lowerInput.includes('get all') || 
-                         lowerInput.includes('all nfd') ||
-                         lowerInput.includes('all nfds') ||
-                         lowerInput.includes('show all nfd');
-
     // Address patterns
     const addressPattern = /^[A-Z2-7]{57}[AEIMQUY4]$/i;
     const addressPattern58 = /^[A-Z2-7]{58}$/i;
     
+    // Operation 1: Check if user wants to get all NFD names associated with an address
+    const wantsAllNfds = lowerInput.includes('get all') || 
+                         lowerInput.includes('all nfd') ||
+                         lowerInput.includes('all nfds') ||
+                         lowerInput.includes('show all nfd') ||
+                         lowerInput.includes('list all nfd') ||
+                         lowerInput.includes('all nfd names associated');
 
-    // Check if user wants to resolve an address (reverse lookup)
-    const wantsResolveAddress = lowerInput.includes('resolve') && 
-                                (lowerInput.includes('address') || lowerInput.includes('an address'));
+    // Operation 2: Check if user wants to resolve an address (address → primary NFD name)
+    const wantsResolveAddress = (lowerInput.includes('resolve') && 
+                                 (lowerInput.includes('address') || lowerInput.includes('an address'))) ||
+                                lowerInput.includes('resolve address') ||
+                                lowerInput.includes('what name') && lowerInput.includes('address');
     
-    // Check if user wants reverse lookup
-    const wantsReverseLookup = lowerInput.includes('reverse') && 
-                                (lowerInput.includes('lookup') || lowerInput.includes('look up'));
+    // Operation 3: Check if user wants reverse lookup (NFD name → address)
+    const wantsReverseLookup = (lowerInput.includes('reverse') && 
+                               (lowerInput.includes('lookup') || lowerInput.includes('look up'))) ||
+                              (lowerInput.includes('reverse lookup') && 
+                               (lowerInput.includes('nfd') || lowerInput.includes('name'))) ||
+                              (lowerInput.includes('what address') && 
+                               (lowerInput.includes('nfd') || lowerInput.includes('name')));
     
     // Check if user wants to mint an NFD
     const wantsMintNfd = lowerInput.includes('mint') && 
@@ -1622,28 +1719,28 @@ export default function AIAgent() {
       return null;
     }
 
-    // If user wants to resolve an address and we don't have pending state, start the flow
+    // Operation 2: If user wants to resolve an address and we don't have pending state, start the flow
     if (wantsResolveAddress && !pendingNFDLookup) {
-      setPendingNFDLookup({ step: "address", operation: "reverseLookup" });
+      setPendingNFDLookup({ step: "address", operation: "resolveAddress" });
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: "Sure! Tell me the address you want to resolve.",
+          content: "Sure! I'll resolve an address to get its primary NFD name(s). Please provide the Algorand address.",
         },
       ]);
       setLoading(false);
       return null;
     }
 
-    // If user wants reverse lookup and we don't have pending state, start the flow
+    // Operation 3: If user wants reverse lookup (NFD name → address) and we don't have pending state, start the flow
     if (wantsReverseLookup && !pendingNFDLookup) {
-      setPendingNFDLookup({ step: "address", operation: "reverseLookup" });
+      setPendingNFDLookup({ step: "name", operation: "reverseLookup" });
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: "Sure! Tell me the name you want to reverse lookup.",
+          content: "Sure! I'll reverse lookup an NFD name to get its address. Please provide the NFD name (e.g., 'myname.algo').",
         },
       ]);
       setLoading(false);
@@ -1778,62 +1875,11 @@ export default function AIAgent() {
         }
       }
       
-      // Step 1: Collect address or name (for other operations)
+      // Step 1: Collect address (for getAllNfds or resolveAddress)
       if (pendingNFDLookup.step === "address") {
-        // For reverseLookup, user provides a name (not an address)
-        if (pendingNFDLookup.operation === "reverseLookup") {
-          // Accept any input as a name (not validating as address)
-          setMessages((prev) => [
-            ...prev,
-            {
-              role: "assistant",
-              content: `Got it! Looking up address for NFD name: \`${input}\`. Fetching now...`,
-            },
-          ]);
-
-          // Make the API call with resolveName operation (name to address)
-          try {
-            const response = await fetch("/api/nfd-names", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ 
-                text: input,
-                operation: "resolveName",
-                view: "brief"
-              }),
-            });
-
-            const data = await response.json();
-            
-            if (data.error) {
-              setMessages((prev) => [
-                ...prev,
-                { role: "assistant", content: `❌ Error: ${data.error}` },
-              ]);
-            } else {
-              const formattedContent = formatNFDResponse(data);
-              setMessages((prev) => [
-                ...prev,
-                { role: "assistant", content: formattedContent },
-              ]);
-            }
-            
-            // Reset the flow
-            setPendingNFDLookup(null);
-          } catch (error) {
-            setMessages((prev) => [
-              ...prev,
-              { role: "assistant", content: "❌ Failed to fetch NFD data. Please try again." },
-            ]);
-            setPendingNFDLookup(null);
-          }
-          
-          setLoading(false);
-          return null;
-        } 
-        // For getAllNfds, validate address
-        else if (addressPattern.test(input) || addressPattern58.test(input)) {
-          // For getAllNfds, ask for view type
+        // Validate address
+        if (addressPattern.test(input) || addressPattern58.test(input)) {
+          // For getAllNfds and resolveAddress, ask for view type
           setPendingNFDLookup({ step: "view", address: input, operation: pendingNFDLookup.operation });
           setMessages((prev) => [
             ...prev,
@@ -1857,6 +1903,70 @@ export default function AIAgent() {
         }
       }
 
+      // Step 1: Collect NFD name (for reverseLookup)
+      if (pendingNFDLookup.step === "name" && pendingNFDLookup.operation === "reverseLookup") {
+        const nfdName = input.trim();
+        if (nfdName.length === 0) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "assistant",
+              content: "❌ Please provide a valid NFD name (e.g., 'myname.algo').",
+            },
+          ]);
+          setLoading(false);
+          return null;
+        }
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: `Got it! Looking up address for NFD name: \`${nfdName}\`. Fetching now...`,
+          },
+        ]);
+
+        // Make the API call with reverseLookup operation (name → address)
+        try {
+          const response = await fetch("/api/nfd-names", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+              text: nfdName,
+              operation: "reverseLookup",
+              view: "brief"
+            }),
+          });
+
+          const data = await response.json();
+          
+          if (data.error) {
+            setMessages((prev) => [
+              ...prev,
+              { role: "assistant", content: `❌ Error: ${data.error}` },
+            ]);
+          } else {
+            const formattedContent = formatNFDResponse(data);
+            setMessages((prev) => [
+              ...prev,
+              { role: "assistant", content: formattedContent },
+            ]);
+          }
+          
+          // Reset the flow
+          setPendingNFDLookup(null);
+        } catch (error) {
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: "❌ Failed to fetch NFD data. Please try again." },
+          ]);
+          setPendingNFDLookup(null);
+        }
+        
+        setLoading(false);
+        return null;
+      }
+
       // Step 2: Collect view type (optional) - only for getAllNfds
       if (pendingNFDLookup.step === "view") {
         const viewTypes = ["tiny", "thumbnail", "brief", "full"];
@@ -1875,7 +1985,9 @@ export default function AIAgent() {
           : `with default view type **brief**`;
         
         const operationMessage = pendingNFDLookup.operation === "getAllNfds"
-          ? `fetch all NFDs for address`
+          ? `fetch all NFD names for address`
+          : pendingNFDLookup.operation === "resolveAddress"
+          ? `resolve address to primary NFD name(s)`
           : `resolve address`;
         
         setMessages((prev) => [
@@ -1930,16 +2042,21 @@ export default function AIAgent() {
 
     // Determine operation type based on keywords in the message
     // Only set operation type if not already in a conversational flow
-    if (lowerInput.includes('resolve') && !lowerInput.includes('address')) {
-      operationType = "resolveName";
-    } else if (wantsAllNfds || lowerInput.includes('all')) {
+    if (wantsAllNfds) {
       operationType = "getAllNfds";
+    } else if (wantsResolveAddress) {
+      operationType = "resolveAddress";
+    } else if (wantsReverseLookup) {
+      operationType = "reverseLookup";
+    } else if (addressPattern.test(input) || addressPattern58.test(input)) {
+      // If input is an address, default to resolveAddress
+      operationType = "resolveAddress";
     } else {
-      // Default: try to resolve as name
-      operationType = "resolveName";
+      // If input is a name, default to reverseLookup (name → address)
+      operationType = "reverseLookup";
     }
 
-    // For other operations (resolve name, reverse lookup), use direct API call with operation type
+    // Make direct API call with determined operation type
     return await fetch("/api/nfd-names", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -2184,7 +2301,17 @@ export default function AIAgent() {
 
     // Handle reverse lookup (address to NFD names)
     if (lookupType === 'address') {
-      if (Array.isArray(nfdData) && nfdData.length > 0) {
+      // resolveAddress returns a single NFD object, not an array
+      if (nfdData && typeof nfdData === 'object' && !Array.isArray(nfdData) && nfdData.name) {
+        // Single NFD object
+        let result = `<div style="margin-bottom: 1.5rem;">
+          <div style="color: #10b981; font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;">✅ Found primary NFD name for address:</div>
+          <div style="font-family: monospace; color: #9ca3af; background: rgba(107, 114, 128, 0.1); padding: 0.5rem; border-radius: 0.5rem; display: inline-block;">${input}</div>
+        </div>`;
+        result += createNFDCard(nfdData);
+        return result;
+      } else if (Array.isArray(nfdData) && nfdData.length > 0) {
+        // Multiple NFDs (array)
         let result = `<div style="margin-bottom: 1.5rem;">
           <div style="color: #10b981; font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;">✅ Found ${nfdData.length} NFD name(s) for address:</div>
           <div style="font-family: monospace; color: #9ca3af; background: rgba(107, 114, 128, 0.1); padding: 0.5rem; border-radius: 0.5rem; display: inline-block;">${input}</div>

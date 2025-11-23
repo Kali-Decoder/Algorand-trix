@@ -27,10 +27,11 @@ export async function POST(req: Request) {
     let result: any = null;
     let lookupType: 'name' | 'address' | 'all-nfds' | 'unknown' = 'unknown';
     
-    // Use the operation type provided by the client, or determine it from input
+    // Use the operation type provided by the client
     const operationType = operation || 'auto';
+    console.log("operationType", operationType);
     
-    // Handle based on explicit operation type
+    // Operation 1: getAllNfds - Get all NFD names associated with an address
     if (operationType === 'getAllNfds') {
       // Validate address
       if (!addressPattern.test(input) && !addressPattern58.test(input)) {
@@ -42,7 +43,6 @@ export async function POST(req: Request) {
       
       try {
         result = await getAllNfdsByAddress(input, "owned", 200);
-        console.log("result", result);
         lookupType = 'all-nfds';
       } catch (error) {
         console.error('Error in getAllNfdsByAddress:', error);
@@ -52,41 +52,99 @@ export async function POST(req: Request) {
         );
       }
     }
-    else if (operationType === 'reverseLookup') {
+
+
+    // Operation 2: resolveAddress - Resolve an address to get primary NFD name(s)
+    else if (operationType === 'resolveAddress') {
+      
       // Validate address
       if (!addressPattern.test(input) && !addressPattern58.test(input)) {
         return NextResponse.json(
-          { error: 'Please provide a valid Algorand address for reverse lookup' },
+          { error: 'Please provide a valid Algorand address to resolve' },
           { status: 400 }
         );
       }
       
       try {
-        result = await reverseLookup([input], viewType);
-        lookupType = 'address';
+        result = await getNfd(undefined, { address: input, view: viewType });
         
-        // If reverseLookup returns empty or null, try getAllNfdsByAddress as fallback
-        if (!result || (Array.isArray(result) && result.length === 0)) {
-          result = await getAllNfdsByAddress(input, "owned", 200);
-          lookupType = 'all-nfds';
+        console.log("result before extraction", result);
+        console.log("input address", input);
+        
+        // Handle address lookup response structure: { "ADDRESS": { ...NFD data... } }
+        if (result && typeof result === 'object' && !Array.isArray(result)) {
+          // Check if result has the address as a key (exact match)
+          if (result[input]) {
+            result = result[input]; // Extract NFD data for the address
+            console.log("extracted result", result);
+          } else {
+            // Try to find the address key (case-insensitive or partial match)
+            const resultKeys = Object.keys(result);
+            console.log("result keys", resultKeys);
+            
+            if (resultKeys.length === 0) {
+              // Empty object means no NFD found
+              result = null;
+            } else {
+              // Use the first key (should be the address we queried)
+              const firstKey = resultKeys[0];
+              result = result[firstKey];
+              console.log("using first key", firstKey, "extracted result", result);
+            }
+          }
         }
+        
+        lookupType = 'address';
       } catch (error) {
-        console.error('Error in reverseLookup:', error);
+        console.error('Error in resolveAddress:', error);
         return NextResponse.json(
-          { error: 'Failed to lookup NFD names for this address' },
+          { error: 'Failed to resolve address to NFD name' },
           { status: 500 }
         );
       }
     }
-    else if (operationType === 'resolveName') {
+    // Operation 3: reverseLookup - Reverse lookup an NFD name to get its address
+    else if (operationType === 'reverseLookup') {
+      // Input should be an NFD name (not an address)
+      if (addressPattern.test(input) || addressPattern58.test(input)) {
+        return NextResponse.json(
+          { error: 'Please provide an NFD name (e.g., myname.algo) for reverse lookup, not an address' },
+          { status: 400 }
+        );
+      }
+      
+      // Validate that input looks like an NFD name (ends with .algo) or is numeric
+      const nfdNamePattern = /^(.+\.algo)|(\d+)$/i;
+      if (!nfdNamePattern.test(input)) {
+        return NextResponse.json(
+          { error: 'Invalid NFD name format. Please provide a name ending in .algo (e.g., myname.algo) or a numeric ID' },
+          { status: 400 }
+        );
+      }
+      
       try {
         result = await getNfd(input, viewType);
+        
+        // Check if API returned an error object
+        if (result && typeof result === 'object' && result.name === 'invalid_pattern') {
+          return NextResponse.json(
+            { error: 'Invalid NFD name format. Please provide a name ending in .algo (e.g., myname.algo) or a numeric ID' },
+            { status: 400 }
+          );
+        }
+        
         lookupType = 'name';
-        console.log("result", result);
-      } catch (error) {
-        console.error('Error in getNfd:', error);
+      } catch (error: any) {
+        console.error('Error in reverseLookup:', error);
+        // Check if error is from API validation
+        if (error?.name === 'invalid_pattern' || error?.message?.includes('nameOrID must match')) {
+          return NextResponse.json(
+            { error: 'Invalid NFD name format. Please provide a name ending in .algo (e.g., myname.algo) or a numeric ID' },
+            { status: 400 }
+          );
+        }
         return NextResponse.json(
-          { error: 'Failed to lookup NFD information' },
+          { error: 'Failed to reverse lookup NFD name to address' },
           { status: 500 }
         );
       }
@@ -123,29 +181,67 @@ export async function POST(req: Request) {
           );
         }
       } else if (addressPattern.test(input) || addressPattern58.test(input)) {
+        // If it's an address, default to resolveAddress
         try {
-          result = await reverseLookup([input], viewType);
-          lookupType = 'address';
+          result = await getNfd(undefined, { address: input, view: viewType });
           
-          if (!result || (Array.isArray(result) && result.length === 0)) {
-            result = await getAllNfdsByAddress(input, "owned", 200);
-            lookupType = 'all-nfds';
+          // Handle address lookup response structure: { "ADDRESS": { ...NFD data... } }
+          if (result && typeof result === 'object' && !Array.isArray(result)) {
+            // Check if result has the address as a key
+            if (result[input]) {
+              result = result[input]; // Extract NFD data for the address
+            } else if (Object.keys(result).length === 0) {
+              // Empty object means no NFD found
+              result = null;
+            } else {
+              // If there are other keys, use the first one (shouldn't happen for single address lookup)
+              const firstKey = Object.keys(result)[0];
+              result = result[firstKey];
+            }
           }
+          
+          lookupType = 'address';
         } catch (error) {
-          console.error('Error in address lookup:', error);
+          console.error('Error in resolveAddress:', error);
           return NextResponse.json(
-            { error: 'Failed to lookup NFD names for this address' },
+            { error: 'Failed to resolve address to NFD name' },
             { status: 500 }
           );
         }
       } else {
+        // If it's a name, default to reverseLookup (name to address)
+        // Validate that input looks like an NFD name (ends with .algo) or is numeric
+        const nfdNamePattern = /^(.+\.algo)|(\d+)$/i;
+        if (!nfdNamePattern.test(input)) {
+          return NextResponse.json(
+            { error: 'Invalid input. Please provide a valid Algorand address, NFD name (ending in .algo), or numeric ID' },
+            { status: 400 }
+          );
+        }
+        
         try {
           result = await getNfd(input, viewType);
+          
+          // Check if API returned an error object
+          if (result && typeof result === 'object' && result.name === 'invalid_pattern') {
+            return NextResponse.json(
+              { error: 'Invalid NFD name format. Please provide a name ending in .algo (e.g., myname.algo) or a numeric ID' },
+              { status: 400 }
+            );
+          }
+          
           lookupType = 'name';
-        } catch (error) {
-          console.error('Error in NFD name lookup:', error);
+        } catch (error: any) {
+          console.error('Error in reverseLookup:', error);
+          // Check if error is from API validation
+          if (error?.name === 'invalid_pattern' || error?.message?.includes('nameOrID must match')) {
+            return NextResponse.json(
+              { error: 'Invalid NFD name format. Please provide a name ending in .algo (e.g., myname.algo) or a numeric ID' },
+              { status: 400 }
+            );
+          }
           return NextResponse.json(
-            { error: 'Failed to lookup NFD information' },
+            { error: 'Failed to reverse lookup NFD name to address' },
             { status: 500 }
           );
         }
@@ -153,7 +249,10 @@ export async function POST(req: Request) {
     }
     
     // Format response
-    if (!result) {
+    console.log("final result before response", result);
+    console.log("lookupType", lookupType);
+    
+    if (!result || (typeof result === 'object' && Object.keys(result).length === 0)) {
       return NextResponse.json(
         { 
           error: lookupType === 'address' || lookupType === 'all-nfds'

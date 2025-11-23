@@ -21,3 +21,12 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 
+
+
+<!-- //RSV2YCHXA7MWGFTX3WYI7TVGAS5W5XH5M7ZQVXPPRQ7DNTNW36OW2TRR6I : getallnfds -->
+<!-- // D5J7H7PIYKLY2U6A5OFUAC7GQHTHSXXNX65DSD3CJYPBV2MVK6NTNW44CA,2MQZFP7LNZNQDMJO5F3SZDFVEEHOFH6G3NXSLASIJIB7OLDPVLSCX67QZ4 : resolveaddress 
+artgoanna.algo
+goanna.algo
+retipool2.nfdomains.algo
+validator.nfdomains.algo
+-->
