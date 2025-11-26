@@ -41,6 +41,7 @@ import ResponseDisplay from "./ResponseDisplay";
 
 import { generateImage } from "@/utils/img-gen";
 import { formatNftPrompt } from "@/utils/prompt";
+import { mintNFDNameNFT } from "@/utils/nfd-mint";
 
 import Image from "next/image";
 import { Connect } from "./AlgorandWallet";
@@ -52,7 +53,6 @@ type TabType =
   | "swap"
   | "lend"
   | "trade"
-  | "swap-tokens"
   | "mint"
   | "mint-token"
   | "transfer-token"
@@ -497,13 +497,14 @@ export default function AIAgent() {
   } | null>(null);
 
   const [pendingNFDLookup, setPendingNFDLookup] = useState<{
-    step: "address" | "view" | "confirm" | "name" | "reservedFor" | "linkOnMint";
+    step: "address" | "view" | "confirm" | "name" | "reservedFor" | "linkOnMint" | "years";
     address?: string;
     view?: string;
-    operation?: "getAllNfds" | "reverseLookup" | "resolveAddress" | "mintNfd";
+    operation?: "getAllNfds" | "reverseLookup" | "resolveAddress" | "mintNfd" | "mintNfdNFT";
     nfdName?: string;
     reservedFor?: string;
     linkOnMint?: boolean;
+    years?: number;
   } | null>(null);
 
   const [swapState, setSwapState] = useState<SwapState>({
@@ -1177,9 +1178,132 @@ export default function AIAgent() {
 
   // Handles the "lend" flow.
   const handleLendingSubmit = async () => {
-    return await fetch("/api/lending", {
-      method: "GET",
-    });
+    // Commented out API call - API not working
+    // return await fetch("/api/lending", {
+    //   method: "GET",
+    // });
+
+    // Simulate API delay (2 seconds)
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // Hardcoded Algorand lending protocols response
+    const formattedResponse = `
+      <div style="color: #e5e7eb; font-size: 1rem; line-height: 1.6;">
+        <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem;">
+          <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 1rem; border-radius: 0.75rem; font-size: 2rem;">
+              💰
+            </div>
+            <div>
+              <h2 style="color: #ffffff; font-size: 2rem; font-weight: 700; margin: 0; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                Algorand Lending Protocols
+              </h2>
+              <p style="color: #9ca3af; font-size: 0.9rem; margin: 0.25rem 0 0 0;">
+                Top DeFi lending platforms on Algorand
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+          <!-- Algofi Card -->
+          <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 0.75rem; padding: 1.5rem; transition: all 0.3s;">
+            <div style="display: flex; align-items: start; gap: 1rem;">
+              <div style="background: linear-gradient(135deg, #22c55e 0%, #3b82f6 100%); padding: 0.75rem; border-radius: 0.5rem; font-size: 1.5rem; line-height: 1; flex-shrink: 0;">
+                🏦
+              </div>
+              <div style="flex: 1;">
+                <h3 style="color: #ffffff; font-size: 1.5rem; font-weight: 600; margin: 0 0 0.5rem 0;">
+                  Algofi
+                </h3>
+                <p style="color: #d1d5db; font-size: 1rem; margin: 0 0 1rem 0; line-height: 1.6;">
+                  A crypto lending market on Algorand — you can lend/deposit assets to earn yield, or borrow assets using collateral.
+                </p>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
+                  <span style="background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.4); padding: 0.4rem 0.8rem; border-radius: 0.375rem; color: #86efac; font-size: 0.875rem; font-weight: 500;">
+                    Algorand Technologies
+                  </span>
+                  <span style="background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.4); padding: 0.4rem 0.8rem; border-radius: 0.375rem; color: #86efac; font-size: 0.875rem; font-weight: 500;">
+                    +1
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Folks Finance Card -->
+          <div style="background: linear-gradient(135deg, rgba(251, 146, 60, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%); border: 1px solid rgba(251, 146, 60, 0.3); border-radius: 0.75rem; padding: 1.5rem; transition: all 0.3s;">
+            <div style="display: flex; align-items: start; gap: 1rem;">
+              <div style="background: linear-gradient(135deg, #fb923c 0%, #ec4899 100%); padding: 0.75rem; border-radius: 0.5rem; font-size: 1.5rem; line-height: 1; flex-shrink: 0;">
+                📊
+              </div>
+              <div style="flex: 1;">
+                <h3 style="color: #ffffff; font-size: 1.5rem; font-weight: 600; margin: 0 0 0.5rem 0;">
+                  Folks Finance
+                </h3>
+                <p style="color: #d1d5db; font-size: 1rem; margin: 0 0 1rem 0; line-height: 1.6;">
+                  A capital-markets protocol for lending and borrowing on Algorand. Lets users deposit liquidity or borrow against collateral; supports stablecoins, tokenized assets, and liquidity pools.
+                </p>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
+                  <span style="background: rgba(251, 146, 60, 0.2); border: 1px solid rgba(251, 146, 60, 0.4); padding: 0.4rem 0.8rem; border-radius: 0.375rem; color: #fbbf24; font-size: 0.875rem; font-weight: 500;">
+                    Algorand Technologies
+                  </span>
+                  <span style="background: rgba(251, 146, 60, 0.2); border: 1px solid rgba(251, 146, 60, 0.4); padding: 0.4rem 0.8rem; border-radius: 0.375rem; color: #fbbf24; font-size: 0.875rem; font-weight: 500;">
+                    +2
+                  </span>
+                  <span style="background: rgba(251, 146, 60, 0.2); border: 1px solid rgba(251, 146, 60, 0.4); padding: 0.4rem 0.8rem; border-radius: 0.375rem; color: #fbbf24; font-size: 0.875rem; font-weight: 500;">
+                    DappRadar
+                  </span>
+                  <span style="background: rgba(251, 146, 60, 0.2); border: 1px solid rgba(251, 146, 60, 0.4); padding: 0.4rem 0.8rem; border-radius: 0.375rem; color: #fbbf24; font-size: 0.875rem; font-weight: 500;">
+                    +2
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Folks Finance Bonus Features -->
+          <div style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 0.75rem; padding: 1.5rem; margin-top: 0.5rem;">
+            <div style="display: flex; align-items: start; gap: 1rem;">
+              <div style="background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%); padding: 0.75rem; border-radius: 0.5rem; font-size: 1.5rem; line-height: 1; flex-shrink: 0;">
+                ⭐
+              </div>
+              <div style="flex: 1;">
+                <h4 style="color: #ffffff; font-size: 1.1rem; font-weight: 600; margin: 0 0 0.75rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                  <span>(Bonus) DeFi features on Folks:</span>
+                </h4>
+                <p style="color: #d1d5db; font-size: 1rem; margin: 0 0 1rem 0; line-height: 1.6;">
+                  Folks also includes additional DeFi primitives — liquid staking (so you can stake ALGO and get a liquid token back), lending pools, DEX / token-swap support, and cross-chain liquidity via integrations.
+                </p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-top: 1rem;">
+                  <div style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); padding: 0.75rem; border-radius: 0.5rem;">
+                    <div style="color: #c084fc; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">💧 Liquid Staking</div>
+                    <div style="color: #d1d5db; font-size: 0.8rem;">Stake ALGO, get liquid token</div>
+                  </div>
+                  <div style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); padding: 0.75rem; border-radius: 0.5rem;">
+                    <div style="color: #c084fc; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">🏊 Lending Pools</div>
+                    <div style="color: #d1d5db; font-size: 0.8rem;">Deposit & earn yield</div>
+                  </div>
+                  <div style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); padding: 0.75rem; border-radius: 0.5rem;">
+                    <div style="color: #c084fc; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">🔄 DEX / Token Swap</div>
+                    <div style="color: #d1d5db; font-size: 0.8rem;">Token swapping support</div>
+                  </div>
+                  <div style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); padding: 0.75rem; border-radius: 0.5rem;">
+                    <div style="color: #c084fc; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">🌐 Cross-Chain</div>
+                    <div style="color: #d1d5db; font-size: 0.8rem;">Cross-chain liquidity</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Return mock Response object
+    return {
+      json: async () => ({ data: formattedResponse })
+    } as Response;
   };
 
   const handleAlgorandHelperSubmit = async (
@@ -1317,18 +1441,334 @@ export default function AIAgent() {
 
   // Handles the "trade" flow.
   const handleTradeSubmit = async () => {
-    return await fetch("/api/trade", {
-      method: "GET",
-    });
+    // Commented out API call - API not working
+    // return await fetch("/api/trade", {
+    //   method: "GET",
+    // });
+
+    // Simulate API delay (2 seconds)
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // Hardcoded DeFi comparison response
+    const formattedResponse = `
+      <div style="color: #e5e7eb; font-size: 1rem; line-height: 1.6;">
+        <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem;">
+          <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 1rem; border-radius: 0.75rem; font-size: 2rem;">
+              ⚖️
+            </div>
+            <div>
+              <h2 style="color: #ffffff; font-size: 2rem; font-weight: 700; margin: 0; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                DeFi Comparison: Ethereum vs Algorand
+              </h2>
+              <p style="color: #9ca3af; font-size: 0.9rem; margin: 0.25rem 0 0 0;">
+                Comparing the two leading DeFi ecosystems
+              </p>
+            </div>
+          </div>
+          
+          <p style="color: #d1d5db; font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem; padding: 1rem; background: rgba(0, 0, 0, 0.2); border-radius: 0.5rem; border-left: 4px solid #6366f1;">
+            When comparing DeFi on Ethereum and Algorand, both ecosystems offer lending, borrowing, and yield opportunities — but they serve different strengths.
+          </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+          <!-- Ethereum Card -->
+          <div style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 0.75rem; padding: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+              <div style="background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); padding: 0.75rem; border-radius: 0.5rem; font-size: 1.5rem; line-height: 1;">
+                💎
+              </div>
+              <h3 style="color: #ffffff; font-size: 1.5rem; font-weight: 600; margin: 0;">
+                Ethereum
+              </h3>
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+              <h4 style="color: #c084fc; font-size: 1rem; font-weight: 600; margin: 0 0 0.5rem 0;">💧 Deepest Liquidity</h4>
+              <p style="color: #d1d5db; font-size: 0.9rem; margin: 0; line-height: 1.6;">
+                Ethereum has the deepest liquidity in all of crypto, offering significantly higher yields due to large volume of funds and active traders — though this also means higher risk.
+              </p>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+              <h4 style="color: #c084fc; font-size: 1rem; font-weight: 600; margin: 0 0 0.5rem 0;">🏦 Leading Protocols</h4>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <span style="background: rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.4); padding: 0.4rem 0.8rem; border-radius: 0.375rem; color: #c084fc; font-size: 0.875rem;">
+                  Aave
+                </span>
+                <span style="background: rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.4); padding: 0.4rem 0.8rem; border-radius: 0.375rem; color: #c084fc; font-size: 0.875rem;">
+                  Compound
+                </span>
+                <span style="background: rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.4); padding: 0.4rem 0.8rem; border-radius: 0.375rem; color: #c084fc; font-size: 0.875rem;">
+                  Spark
+                </span>
+                <span style="background: rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.4); padding: 0.4rem 0.8rem; border-radius: 0.375rem; color: #c084fc; font-size: 0.875rem;">
+                  Morpho
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <h4 style="color: #c084fc; font-size: 1rem; font-weight: 600; margin: 0 0 0.5rem 0;">🪙 Stablecoins</h4>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                <span style="background: rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.4); padding: 0.4rem 0.8rem; border-radius: 0.375rem; color: #c084fc; font-size: 0.875rem;">
+                  USDC
+                </span>
+                <span style="background: rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.4); padding: 0.4rem 0.8rem; border-radius: 0.375rem; color: #c084fc; font-size: 0.875rem;">
+                  DAI
+                </span>
+                <span style="background: rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.4); padding: 0.4rem 0.8rem; border-radius: 0.375rem; color: #c084fc; font-size: 0.875rem;">
+                  FRAX
+                </span>
+                <span style="background: rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.4); padding: 0.4rem 0.8rem; border-radius: 0.375rem; color: #c084fc; font-size: 0.875rem;">
+                  + More
+                </span>
+              </div>
+            </div>
+
+            <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(139, 92, 246, 0.1); border-radius: 0.5rem; border-left: 3px solid #8b5cf6;">
+              <p style="color: #d1d5db; font-size: 0.875rem; margin: 0; line-height: 1.5;">
+                <strong style="color: #c084fc;">Trade-off:</strong> Higher yields but also higher risk due to market volatility and complexity.
+              </p>
+            </div>
+          </div>
+
+          <!-- Algorand Card -->
+          <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 0.75rem; padding: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+              <div style="background: linear-gradient(135deg, #22c55e 0%, #3b82f6 100%); padding: 0.75rem; border-radius: 0.5rem; font-size: 1.5rem; line-height: 1;">
+                ⚡
+              </div>
+              <h3 style="color: #ffffff; font-size: 1.5rem; font-weight: 600; margin: 0;">
+                Algorand
+              </h3>
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+              <h4 style="color: #86efac; font-size: 1rem; font-weight: 600; margin: 0 0 0.5rem 0;">🌱 Stable & Eco-Friendly</h4>
+              <p style="color: #d1d5db; font-size: 0.9rem; margin: 0; line-height: 1.6;">
+                While liquidity is lower compared to Ethereum, Algorand provides a more stable and eco-friendly environment with very low transaction fees, making it suitable for secure and cost-efficient DeFi use cases.
+              </p>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+              <h4 style="color: #86efac; font-size: 1rem; font-weight: 600; margin: 0 0 0.5rem 0;">🏦 Leading Protocols</h4>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <span style="background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.4); padding: 0.4rem 0.8rem; border-radius: 0.375rem; color: #86efac; font-size: 0.875rem;">
+                  Folks Finance
+                </span>
+                <span style="background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.4); padding: 0.4rem 0.8rem; border-radius: 0.375rem; color: #86efac; font-size: 0.875rem;">
+                  Algofi
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <h4 style="color: #86efac; font-size: 1rem; font-weight: 600; margin: 0 0 0.5rem 0;">🪙 Stablecoins</h4>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                <span style="background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.4); padding: 0.4rem 0.8rem; border-radius: 0.375rem; color: #86efac; font-size: 0.875rem;">
+                  USDC
+                </span>
+                <span style="background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.4); padding: 0.4rem 0.8rem; border-radius: 0.375rem; color: #86efac; font-size: 0.875rem;">
+                  USDT
+                </span>
+              </div>
+            </div>
+
+            <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(34, 197, 94, 0.1); border-radius: 0.5rem; border-left: 3px solid #22c55e;">
+              <p style="color: #d1d5db; font-size: 0.875rem; margin: 0; line-height: 1.5;">
+                <strong style="color: #86efac;">Advantage:</strong> Lower fees, faster transactions, and a more sustainable blockchain infrastructure.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div style="background: linear-gradient(135deg, rgba(251, 146, 60, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%); border: 1px solid rgba(251, 146, 60, 0.3); border-radius: 0.75rem; padding: 1.5rem;">
+          <h3 style="color: #ffffff; font-size: 1.25rem; font-weight: 600; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+            <span>💡</span>
+            <span>Key Takeaway</span>
+          </h3>
+          <p style="color: #d1d5db; font-size: 1rem; margin: 0; line-height: 1.8;">
+            Both ecosystems offer robust DeFi solutions, but serve different needs: <strong style="color: #fbbf24;">Ethereum</strong> for maximum liquidity and higher yields (with higher risk), and <strong style="color: #fbbf24;">Algorand</strong> for cost-efficient, eco-friendly, and stable DeFi operations.
+          </p>
+        </div>
+      </div>
+    `;
+
+    // Return mock Response object
+    return {
+      json: async () => ({ data: formattedResponse })
+    } as Response;
   };
 
   // Handles the "general" flow.
   const handleGeneralSubmit = async (currentInput: string) => {
-    return await fetch("/api/general", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: currentInput }),
-    });
+    // Commented out API call due to insufficient credits
+    // return await fetch("/api/general", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ text: currentInput }),
+    // });
+
+    // Simulate API delay (2 seconds)
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // Hardcoded Algorand response
+    const algorandData = {
+      blockchain: "Algorand",
+      creator: "Silvio Micali",
+      launch_year: 2019,
+      consensus_mechanism: "Pure Proof-of-Stake (PPoS)",
+      native_token: "ALGO",
+      transaction_speed: "Approximately 4 seconds finality",
+      transaction_fee: "Less than $0.01",
+      energy_efficiency: "Very low power usage, eco-friendly",
+      smart_contracts: {
+        languages: ["TEAL", "PyTeal"]
+      },
+      features: [
+        "Instant Finality",
+        "High Scalability",
+        "Low Latency",
+        "Secure Cryptographic Design"
+      ],
+      assets: {
+        asset_standard: "Algorand Standard Assets (ASA)",
+        use_cases: ["NFTs", "Stablecoins", "Tokenized RWAs"]
+      },
+      ecosystem_use_cases: [
+        "DeFi Applications",
+        "CBDCs",
+        "Government Projects",
+        "Enterprise Blockchain",
+        "Sustainable Solutions"
+      ],
+      summary: "Algorand is a fast, low-cost, eco-friendly and secure blockchain built for scalable decentralized applications."
+    };
+
+    // Format response as creative HTML
+    const formattedResponse = `
+      <div style="color: #e5e7eb; font-size: 1rem; line-height: 1.6;">
+        <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem;">
+          <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 1rem; border-radius: 0.75rem; font-size: 2rem;">
+              ⚡
+            </div>
+            <div>
+              <h2 style="color: #ffffff; font-size: 2rem; font-weight: 700; margin: 0; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                ${algorandData.blockchain}
+              </h2>
+              <p style="color: #9ca3af; font-size: 0.9rem; margin: 0.25rem 0 0 0;">
+                Created by ${algorandData.creator} • Launched ${algorandData.launch_year}
+              </p>
+            </div>
+          </div>
+          
+          <p style="color: #d1d5db; font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem; padding: 1rem; background: rgba(0, 0, 0, 0.2); border-radius: 0.5rem; border-left: 4px solid #6366f1;">
+            ${algorandData.summary}
+          </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+          <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 0.75rem; padding: 1.25rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+              <span style="font-size: 1.5rem;">🔐</span>
+              <h3 style="color: #ffffff; font-size: 1rem; font-weight: 600; margin: 0;">Consensus</h3>
+            </div>
+            <p style="color: #d1d5db; font-size: 0.9rem; margin: 0;">${algorandData.consensus_mechanism}</p>
+          </div>
+
+          <div style="background: linear-gradient(135deg, rgba(251, 146, 60, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%); border: 1px solid rgba(251, 146, 60, 0.3); border-radius: 0.75rem; padding: 1.25rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+              <span style="font-size: 1.5rem;">⚡</span>
+              <h3 style="color: #ffffff; font-size: 1rem; font-weight: 600; margin: 0;">Speed</h3>
+            </div>
+            <p style="color: #d1d5db; font-size: 0.9rem; margin: 0;">${algorandData.transaction_speed}</p>
+          </div>
+
+          <div style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 0.75rem; padding: 1.25rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+              <span style="font-size: 1.5rem;">💰</span>
+              <h3 style="color: #ffffff; font-size: 1rem; font-weight: 600; margin: 0;">Fee</h3>
+            </div>
+            <p style="color: #d1d5db; font-size: 0.9rem; margin: 0;">${algorandData.transaction_fee}</p>
+          </div>
+
+          <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 0.75rem; padding: 1.25rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+              <span style="font-size: 1.5rem;">🌱</span>
+              <h3 style="color: #ffffff; font-size: 1rem; font-weight: 600; margin: 0;">Eco-Friendly</h3>
+            </div>
+            <p style="color: #d1d5db; font-size: 0.9rem; margin: 0;">${algorandData.energy_efficiency}</p>
+          </div>
+        </div>
+
+        <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 1.5rem;">
+          <h3 style="color: #ffffff; font-size: 1.25rem; font-weight: 600; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+            <span>💎</span>
+            <span>Key Features</span>
+          </h3>
+          <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+            ${algorandData.features.map(feature => `
+              <span style="background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.4); padding: 0.5rem 1rem; border-radius: 0.5rem; color: #d1d5db; font-size: 0.875rem;">
+                ${feature}
+              </span>
+            `).join('')}
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+          <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 0.75rem; padding: 1.5rem;">
+            <h3 style="color: #ffffff; font-size: 1.1rem; font-weight: 600; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+              <span>📝</span>
+              <span>Smart Contracts</span>
+            </h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+              ${algorandData.smart_contracts.languages.map(lang => `
+                <span style="background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); padding: 0.4rem 0.8rem; border-radius: 0.375rem; color: #93c5fd; font-size: 0.875rem; font-family: 'Courier New', monospace;">
+                  ${lang}
+                </span>
+              `).join('')}
+            </div>
+          </div>
+
+          <div style="background: linear-gradient(135deg, rgba(251, 146, 60, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%); border: 1px solid rgba(251, 146, 60, 0.3); border-radius: 0.75rem; padding: 1.5rem;">
+            <h3 style="color: #ffffff; font-size: 1.1rem; font-weight: 600; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+              <span>🪙</span>
+              <span>Assets (ASA)</span>
+            </h3>
+            <p style="color: #d1d5db; font-size: 0.9rem; margin: 0 0 0.75rem 0;">${algorandData.assets.asset_standard}</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+              ${algorandData.assets.use_cases.map(useCase => `
+                <span style="background: rgba(251, 146, 60, 0.2); border: 1px solid rgba(251, 146, 60, 0.4); padding: 0.4rem 0.8rem; border-radius: 0.375rem; color: #fbbf24; font-size: 0.875rem;">
+                  ${useCase}
+                </span>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+
+        <div style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 0.75rem; padding: 1.5rem;">
+          <h3 style="color: #ffffff; font-size: 1.25rem; font-weight: 600; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+            <span>🌐</span>
+            <span>Ecosystem Use Cases</span>
+          </h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
+            ${algorandData.ecosystem_use_cases.map(useCase => `
+              <div style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); padding: 0.75rem; border-radius: 0.5rem; color: #d1d5db; font-size: 0.9rem;">
+                ✨ ${useCase}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Return mock Response object
+    return {
+      json: async () => ({ data: formattedResponse })
+    } as Response;
   };
 
   // Format ecosystem projects response for display as HTML cards
@@ -1630,6 +2070,46 @@ export default function AIAgent() {
                 </div>
               </div>
             </div>
+            
+            <!-- Operation 4 -->
+            <div style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 0.75rem; padding: 1.25rem; transition: all 0.3s;">
+              <div style="display: flex; align-items: start; gap: 0.75rem;">
+                <div style="background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%); padding: 0.5rem; border-radius: 0.5rem; font-size: 1.25rem; line-height: 1;">
+                  🎨
+                </div>
+                <div style="flex: 1;">
+                  <h3 style="color: #ffffff; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">
+                    Mint NFD Name NFT
+                  </h3>
+                  <p style="color: #d1d5db; font-size: 0.875rem; margin-bottom: 0.75rem; line-height: 1.5;">
+                    Mint an NFT for an NFD name with metadata stored on IPFS
+                  </p>
+                  <div style="background: rgba(0, 0, 0, 0.3); border-left: 3px solid #a855f7; padding: 0.5rem 0.75rem; border-radius: 0.375rem; font-size: 0.8rem; color: #9ca3af; font-family: 'Courier New', monospace;">
+                    💬 Example: "mint nfd name nft" or "mint nfd nft"
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Operation 5 -->
+            <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 0.75rem; padding: 1.25rem; transition: all 0.3s;">
+              <div style="display: flex; align-items: start; gap: 0.75rem;">
+                <div style="background: linear-gradient(135deg, #3b82f6 0%, #22c55e 100%); padding: 0.5rem; border-radius: 0.5rem; font-size: 1.25rem; line-height: 1;">
+                  ✨
+                </div>
+                <div style="flex: 1;">
+                  <h3 style="color: #ffffff; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">
+                    Mint NFD
+                  </h3>
+                  <p style="color: #d1d5db; font-size: 0.875rem; margin-bottom: 0.75rem; line-height: 1.5;">
+                    Mint an NFD name through the NFD Registry contract
+                  </p>
+                  <div style="background: rgba(0, 0, 0, 0.3); border-left: 3px solid #3b82f6; padding: 0.5rem 0.75rem; border-radius: 0.375rem; font-size: 0.8rem; color: #9ca3af; font-family: 'Courier New', monospace;">
+                    💬 Example: "mint nfd" or "mint nfd name"
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       `;
@@ -1646,7 +2126,7 @@ export default function AIAgent() {
     }
     
     // Determine operation type based on input
-    type OperationType = "getAllNfds" | "resolveAddress" | "reverseLookup" | null;
+    type OperationType = "getAllNfds" | "resolveAddress" | "reverseLookup" | "mintNfdNFT" | null;
     let operationType: OperationType = null;
     
     // Address patterns
@@ -1675,11 +2155,45 @@ export default function AIAgent() {
                               (lowerInput.includes('what address') && 
                                (lowerInput.includes('nfd') || lowerInput.includes('name')));
     
-    // Check if user wants to mint an NFD
+    // Check if user wants to mint an NFD (Registry contract)
     const wantsMintNfd = lowerInput.includes('mint') && 
-                         (lowerInput.includes('nfd') || lowerInput.includes('name'));
+                         (lowerInput.includes('nfd') || lowerInput.includes('name')) &&
+                         !lowerInput.includes('nft');
     
-    // If user wants to mint NFD and we don't have pending state, start the flow
+    // Check if user wants to mint an NFD Name NFT
+    const wantsMintNfdNFT = (lowerInput.includes('mint') && 
+                             (lowerInput.includes('nfd') || lowerInput.includes('name')) &&
+                             lowerInput.includes('nft')) ||
+                            lowerInput.includes('mint nfd nft') ||
+                            lowerInput.includes('mint nfd name nft');
+    
+    // If user wants to mint NFD Name NFT and we don't have pending state, start the flow
+    if (wantsMintNfdNFT && !pendingNFDLookup) {
+      if (!activeAddress) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: "❌ Please connect your wallet first to mint an NFD name NFT.",
+          },
+        ]);
+        setLoading(false);
+        return null;
+      }
+      
+      setPendingNFDLookup({ step: "name", operation: "mintNfdNFT" });
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Sure! Let's mint an NFD name NFT. What NFD name would you like to mint? (e.g., 'myname.algo')",
+        },
+      ]);
+      setLoading(false);
+      return null;
+    }
+    
+    // If user wants to mint NFD (Registry) and we don't have pending state, start the flow
     if (wantsMintNfd && !pendingNFDLookup) {
       if (!activeAddress) {
         setMessages((prev) => [
@@ -1864,6 +2378,108 @@ export default function AIAgent() {
               {
                 role: "assistant",
                 content: `❌ Error minting NFD: ${error.message || 'Failed to mint NFD. Please try again.'}`,
+              },
+            ]);
+          }
+          
+          // Reset the flow
+          setPendingNFDLookup(null);
+          setLoading(false);
+          return null;
+        }
+      }
+      
+      // Mint NFD Name NFT flow
+      if (pendingNFDLookup.operation === "mintNfdNFT") {
+        // Step 1: Collect NFD name
+        if (pendingNFDLookup.step === "name") {
+          const nfdName = input.trim();
+          if (nfdName.length === 0) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: "assistant",
+                content: "❌ Please provide a valid NFD name (e.g., 'myname.algo').",
+              },
+            ]);
+            setLoading(false);
+            return null;
+          }
+          
+          setPendingNFDLookup({ 
+            step: "years", 
+            operation: "mintNfdNFT",
+            nfdName: nfdName
+          });
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "assistant",
+              content: `Got it! NFD name: \`${nfdName}\`\n\nHow many years would you like to register this NFD for? (Enter a number, e.g., 1, 2, 5)`,
+            },
+          ]);
+          setLoading(false);
+          return null;
+        }
+        
+        // Step 2: Collect years
+        if (pendingNFDLookup.step === "years") {
+          const yearsInput = input.trim();
+          const years = parseInt(yearsInput, 10);
+          
+          if (isNaN(years) || years <= 0) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: "assistant",
+                content: "❌ Please provide a valid number of years (must be greater than 0).",
+              },
+            ]);
+            setLoading(false);
+            return null;
+          }
+          
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "assistant",
+              content: `Perfect! I'll mint an NFD name NFT for \`${pendingNFDLookup.nfdName}\` registered for ${years} year${years > 1 ? 's' : ''}.\n\nCreating metadata and uploading to IPFS, then minting the NFT...\n\n⚠️ **Please approve the transaction in your wallet when prompted.**`,
+            },
+          ]);
+          
+          // Call mintNFDNameNFT function
+          try {
+            if (!activeAddress || !transactionSigner) {
+              throw new Error('Wallet not connected. Please connect your wallet first.');
+            }
+            
+            console.log('Calling mintNFDNameNFT with:', {
+              nfdName: pendingNFDLookup.nfdName,
+              years: years,
+              activeAddress: activeAddress,
+              hasSigner: !!transactionSigner,
+            });
+            
+            const result = await mintNFDNameNFT({
+              nfdName: pendingNFDLookup.nfdName || '',
+              years: years,
+              activeAddress: activeAddress,
+              transactionSigner: transactionSigner,
+            });
+            
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: "assistant",
+                content: `✅ NFD Name NFT minted successfully!\n\n**Details:**\n- NFD Name: \`${pendingNFDLookup.nfdName}\`\n- Registration Years: ${years}\n- Asset ID: ${result.assetId.toString()}\n- Metadata URL: ${result.metadataUrl}\n- Explorer: [View Transaction](${result.explorerLink})`,
+              },
+            ]);
+          } catch (error: any) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: "assistant",
+                content: `❌ Error minting NFD Name NFT: ${error.message || 'Failed to mint NFT. Please try again.'}`,
               },
             ]);
           }
@@ -2709,11 +3325,6 @@ const ${name} = async (${paramNames}) => {
           if (!response) return; 
           break;
 
-        case "swap-tokens":
-          response = await handleSwapSubmit(currentInput);
-          if (!response) return; // Early return if mint flow ended early
-          break;
-
         case "transfer-token":
           response = await handleTransferToken(currentInput);
           if (!response) return; // Early return if mint flow ended early
@@ -2833,11 +3444,6 @@ const ${name} = async (${paramNames}) => {
     { id: "get-quotes", label: "Get Quotes", icon: <ChartNoAxesCombined size={20} /> },
     { id: "transfer-native-token", label: "Transfer ALGO", icon: <HandCoins size={20} /> },
     { id: "transfer-token", label: "Transfer Tokens", icon: <HandCoins size={20} /> },
-    {
-      id: "swap-tokens",
-      label: "Swap Tokens",
-      icon: <ArrowRightLeft size={20} />,
-    },
     { id: "mint", label: "Mint", icon: <ImagePlay size={20} /> },
     {
       id: "algorand-helper",
@@ -3068,7 +3674,7 @@ const ${name} = async (${paramNames}) => {
                 Algorand NFD Names
               </h2>
               <p className="text-center max-w-md mb-8 text-yellow-400">
-                Look up Algorand NameFi Domains (NFD) names and addresses. Four operations available: resolve name to address, reverse lookup address to names, get all NFDs for an address, or mint a new NFD name.
+                Look up Algorand NameFi Domains (NFD) names and addresses. Five operations available: resolve name to address, reverse lookup address to names, get all NFDs for an address, mint a new NFD name, or mint an NFD name NFT.
               </p>
               <div className="grid grid-cols-2 gap-4 w-full max-w-4xl">
                 {[
@@ -3076,6 +3682,7 @@ const ${name} = async (${paramNames}) => {
                   "Reverse lookup: Address to NFD names",
                   "Get all NFDs for an address",
                   "Mint NFD name",
+                  "Mint NFD name NFT",
                 ].map((suggestion, idx) => (
                   <button
                     key={idx}

@@ -10,8 +10,8 @@ export const aiClient = new OpenAI({
 export async function queryLLM(prompt: string) {
   try {
     if (!HYPERBOLIC_API_KEY) {
-      console.error('Error: OpenAI API key is missing.');
-      throw new Error('OpenAI API key is missing.');
+      console.error('Error: Hyperbolic API key is missing.');
+      throw new Error('Hyperbolic API key is missing. Please set HYPERBOLIC_API_KEY in your environment variables.');
     }
 
     console.log(prompt)
@@ -21,8 +21,20 @@ export async function queryLLM(prompt: string) {
     });
 
     return response.choices[0]?.message?.content?.trim() || 'No response';
-  } catch (error) {
+  } catch (error: any) {
     console.error('LLM Query Error:', error);
-    throw new Error('AI processing failed.');
+    
+    // Handle specific HTTP status codes
+    if (error?.status === 402) {
+      throw new Error('Payment required: Your Hyperbolic API account may need billing setup or has insufficient credits. Please check your account status.');
+    } else if (error?.status === 401) {
+      throw new Error('Unauthorized: Invalid API key. Please check your HYPERBOLIC_API_KEY environment variable.');
+    } else if (error?.status === 429) {
+      throw new Error('Rate limit exceeded: Too many requests. Please try again later.');
+    } else if (error?.message) {
+      throw new Error(`AI processing failed: ${error.message}`);
+    } else {
+      throw new Error('AI processing failed. Please check your API configuration and try again.');
+    }
   }
 }
