@@ -28,7 +28,9 @@ goanna.algo
 retipool2.nfdomains.algo
 validator.nfdomains.algo
 -->
-
+<!-- 
 // Give me some general Details about algorand blockchain
 // Hey can you sugfgest me some lending pools of algorand stuffs
-// Analayze eth/algo strategies
+// Analayze eth/algo strategies -->
+
+
