@@ -1183,8 +1183,8 @@ export default function AIAgent() {
     //   method: "GET",
     // });
 
-    // Simulate API delay (2 seconds)
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Simulate API delay (1 second)
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Hardcoded Algorand lending protocols response
     const formattedResponse = `
@@ -1441,15 +1441,7 @@ export default function AIAgent() {
 
   // Handles the "trade" flow.
   const handleTradeSubmit = async () => {
-    // Commented out API call - API not working
-    // return await fetch("/api/trade", {
-    //   method: "GET",
-    // });
-
-    // Simulate API delay (2 seconds)
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // Hardcoded DeFi comparison response
+    await new Promise(resolve => setTimeout(resolve, 1000));
     const formattedResponse = `
       <div style="color: #e5e7eb; font-size: 1rem; line-height: 1.6;">
         <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem;">
@@ -1611,8 +1603,8 @@ export default function AIAgent() {
     //   body: JSON.stringify({ text: currentInput }),
     // });
 
-    // Simulate API delay (2 seconds)
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Simulate API delay (1 second)
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Hardcoded Algorand response
     const algorandData = {
@@ -1842,7 +1834,6 @@ export default function AIAgent() {
           });
         });
       } else {
-        // Single category or search results
         if (data.category) {
           htmlContent += `<div style="margin-top: 1rem; margin-bottom: 1rem;">
             <h3 style="color: #ffffff; font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid rgba(99, 102, 241, 0.3); display: flex; align-items: center; gap: 0.5rem;">
@@ -1852,7 +1843,6 @@ export default function AIAgent() {
           </div>`;
         }
         
-        // Render all project cards
         data.projects.forEach((project: any) => {
           htmlContent += createProjectCard(project);
         });

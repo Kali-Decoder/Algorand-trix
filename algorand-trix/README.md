@@ -32,5 +32,41 @@ validator.nfdomains.algo
 // Give me some general Details about algorand blockchain
 // Hey can you sugfgest me some lending pools of algorand stuffs
 // Analayze eth/algo strategies -->
+<!-- 
+How many projects are there?
+Can you show me all projects that are related to block Explorer
+Dart SDK
+
+
+Hecy can you give me all oracles supported on Algorand
+RPCS leading on algorand -->
+
+<!-- Receiver : RK6K3SMBBNVUH3CZIQNHB4EEDOQSLZHYBLJPSDSBYIQN75RU5VUVWQXGVA -->
+<!-- Asset ID : 10458941 -->
+
+<!-- Can you generate_function for me on frontend side
+generate_function
+{
+  "name": "MyContract",
+  "methods": [
+    {
+      "name": "transfer",
+      "args": [
+        { "name": "to", "type": "address" },
+        { "name": "amount", "type": "uint256" }
+      ],
+      "readonly": false
+    },
+    {
+      "name": "balanceOf",
+      "args": [
+        { "name": "owner", "type": "address" }
+      ],
+      "readonly": true
+    }
+  ]
+} -->
+
+
 
 
