@@ -15,37 +15,65 @@ It's **fully on-chain, developer-oriented, and authority-first**—meaning **you
 
 ## ✨ Features  
 
-- 🔄 **Swap** – Instantly swap tokens with on-chain execution.  
-- 💸 **Lend** – Lend assets securely and earn yields.  
-- 📈 **Trade** – Execute trades on Algorand and beyond.  
-- 🎨 **Mint** – Create NFTs easily with prompt-based generation.  
-- 🪙 **Mint Token** – Launch and configure your own tokens.  
-- 📤 **Transfer Token** – Send tokens securely, fully on-chain.  
-- 🔗 **Transfer Native Token** – Move ALGO or other native assets effortlessly.  
-- 📊 **Get Quotes** – Fetch best quotes and prices across protocols.  
-- 🌉 **Cross-Chain** – Execute cross-chain swaps, bridging, and transfers.  
-- ⚡ **Generate** – AI-assisted generation for NFTs, assets, and strategies.  
-- 🤖 **Algorand Helper** – Learn about RPCs, indexers, account abstraction, oracles, and more with AI-driven explanations.
+### Core DeFi Operations 
+- 💸 **Lend** – Lend assets securely and earn yields. Get AI-powered recommendations for lending protocols based on TVL, APY, and security factors.  
+- 📈 **Trade** – Execute trades on Algorand and beyond. Access DEX trading data and get best trading opportunities with liquidity and volume analysis.  
+- 📊 **Get Quotes** – Fetch best quotes and prices across multiple protocols and DEXs. Compare rates before executing trades.  
+
+### Token & Asset Management
+- 🪙 **Mint Token** – Launch and configure your own tokens on Algorand. Create custom tokens with full control over parameters.  
+- 📤 **Transfer Token** – Send tokens securely, fully on-chain. Transfer any Algorand Standard Asset (ASA) to any address.  
+- 🔗 **Transfer Native Token** – Move ALGO or other native assets effortlessly between addresses.  
+
+### NFT Operations
+- 🎨 **Mint NFT** – Create NFTs easily with AI-powered prompt-based image generation. Generate unique artwork from text descriptions and mint directly to the blockchain.  
+- 🏷️ **NFD Names** – Resolve Algorand addresses to NFD (Name) names, perform reverse lookups, and discover all NFDs associated with an address.  
+
+### Developer Tools
+- 💻 **Coding Helper** – Generate integration functions from smart contract ABIs. Automatically create TypeScript/JavaScript functions for interacting with any contract.  
+- 🤖 **Algorand Helper** – Learn about RPCs, indexers, account abstraction, oracles, DeFi protocols, wallet infrastructure, and more with AI-driven explanations.  
+- 🌐 **Ecosystem Projects Explorer** – Discover and explore Algorand ecosystem projects. Search by category, find projects with GitHub repositories, and get detailed information about tools, wallets, DEXs, and more.  
+
+### AI & Automation
+- ⚡ **AI-Powered Prompts** – All operations can be executed using natural language. The AI understands your intent and executes the appropriate blockchain operations.  
+- 🧠 **General Assistant** – Ask questions, get information, and receive guidance on DeFi operations, blockchain concepts, and more.
 
 ---
 
 ## 🛠️ Supported Tabs  
 
+The application provides multiple specialized tabs for different operations. Some tabs require wallet connection, while others (General, Ecosystem Projects, NFD Names) are available without connecting a wallet.
+
 ```ts
 type TabType =
-  | "general"
-  | "swap"
-  | "lend"
-  | "trade"
-  | "mint"
-  | "mint-token"
-  | "transfer-token"
-  | "transfer-native-token"
-  | "get-quotes"
-  | "cross-chain"
-  | "generate"
-  | "algorand-helper";
+  | "general"                    // General AI assistant (no wallet required)
+  | "generate"                   // Coding Helper - Generate functions from ABIs
+  | "mint-token"                 // Mint custom tokens (wallet required)
+  | "lend"                       // Lending operations (wallet required)
+  | "trade"                      // Trading operations (wallet required)
+  | "get-quotes"                 // Get price quotes (wallet required)
+  | "transfer-native-token"      // Transfer ALGO (wallet required)
+  | "transfer-token"             // Transfer ASAs (wallet required)
+  | "mint"                       // Mint NFTs (wallet required)
+  | "algorand-helper"            // Algorand ecosystem knowledge (no wallet required)
+  | "ecosystem-project"          // Explore Algorand projects (no wallet required)
+  | "nfd-names";                 // NFD name resolution (no wallet required)
 ```
+
+### Tab Descriptions
+
+- **General** - Ask any DeFi or blockchain-related questions. Get AI-powered responses and guidance.
+- **Coding Helper** - Generate integration functions from contract ABIs. Simply provide an ABI JSON and get ready-to-use TypeScript functions.
+- **Mint Tokens** - Create and deploy custom tokens on Algorand with configurable parameters.
+- **Lending** - Get AI-analyzed lending protocol recommendations with TVL, APY, and risk assessments.
+- **Trading** - Access DEX trading data and receive best trading opportunities with liquidity analysis.
+- **Get Quotes** - Compare prices and quotes across multiple protocols before executing trades.
+- **Transfer ALGO** - Send native ALGO tokens to any Algorand address.
+- **Transfer Tokens** - Transfer any Algorand Standard Asset (ASA) to other addresses.
+- **Mint** - Generate NFT images from text prompts using AI and mint them to the blockchain.
+- **Algorand Helper** - Learn about Algorand infrastructure: RPCs, indexers, oracles, account abstraction, DeFi protocols, and wallet infrastructure.
+- **Ecosystem Projects** - Explore the Algorand ecosystem. Search projects by category, find open-source projects, and discover tools, wallets, DEXs, and more.
+- **Algorand NFD Names** - Resolve addresses to NFD names, lookup addresses from names, and discover all NFDs owned by an address.
 
 ---
 
@@ -147,29 +175,57 @@ algorand-trix/
 ├── src/
 │   ├── app/                    # Next.js app directory
 │   │   ├── api/               # API routes
-│   │   │   ├── ai-process/    # AI processing endpoints
-│   │   │   ├── cross-chain/   # Cross-chain operations
-│   │   │   ├── lending/       # Lending operations
-│   │   │   ├── nft/           # NFT minting
-│   │   │   ├── quotes/        # Price quotes
-│   │   │   ├── swap-cow/      # CowSwap integration
-│   │   │   └── ...
+│   │   │   ├── ai-process/    # AI processing endpoints (swap, lending, trading, general)
+│   │   │   ├── cross-chain/   # Cross-chain operations (OFT transfers)
+│   │   │   ├── deposit-approve-cow/  # Safe wallet deposit & approve for CowSwap
+│   │   │   ├── ecosystem-projects/   # Algorand ecosystem project explorer
+│   │   │   ├── general/       # General AI assistant endpoint
+│   │   │   ├── lending/       # Lending protocol data and recommendations
+│   │   │   ├── native-swap/   # Native token swap operations
+│   │   │   ├── nfd-names/     # NFD name resolution and lookup
+│   │   │   ├── nft/           # NFT minting operations
+│   │   │   ├── quotes/        # Price quotes across protocols
+│   │   │   ├── setup-safe/    # Safe wallet setup and deployment
+│   │   │   ├── swap-cow/      # CowSwap integration for EVM swaps
+│   │   │   ├── trade/         # Trading operations and DEX data
+│   │   │   └── wallet/        # Wallet registration and management
 │   │   ├── layout.tsx         # Root layout
-│   │   └── page.tsx           # Home page
+│   │   └── page.tsx           # Home page with wallet provider setup
 │   ├── components/            # React components
-│   │   ├── AIAgent.tsx        # Main AI agent component
-│   │   ├── AlgorandWallet.tsx # Wallet connection
-│   │   └── ui/                # UI components
+│   │   ├── AIAgent.tsx        # Main AI agent component with all tab logic
+│   │   ├── AlgorandWallet.tsx # Wallet connection component
+│   │   ├── ResponseDisplay.tsx # Response rendering component
+│   │   ├── WalletModal.tsx    # Wallet selection modal
+│   │   ├── CustomConnect.tsx  # Custom wallet connection UI
+│   │   ├── HardCodedReplys/   # Pre-defined responses for Algorand Helper
+│   │   └── ui/                # UI components (shadcn/ui)
+│   │       ├── button.tsx
+│   │       ├── dialog.tsx
+│   │       └── select.tsx
 │   ├── lib/                   # Utility libraries
-│   │   ├── abi.ts             # Contract ABIs
-│   │   ├── constants.ts       # Constants
-│   │   ├── db.ts              # Database connection
-│   │   └── filebase.ts        # IPFS/filebase integration
+│   │   ├── abi.ts             # Contract ABIs (WETH, etc.)
+│   │   ├── constants.ts       # Constants (addresses, chain IDs, etc.)
+│   │   ├── db.ts              # MongoDB database connection
+│   │   ├── deployment_config.ts  # Deployment configurations
+│   │   ├── filebase.ts        # IPFS/filebase integration
+│   │   ├── types.ts           # TypeScript type definitions
+│   │   └── utils.ts           # General utility functions
 │   ├── models/                # Data models
+│   │   └── Wallet.ts          # Wallet model for database
+│   ├── constant/              # Static data
+│   │   └── projects.json      # Algorand ecosystem projects data
 │   └── utils/                 # Utility functions
-│       ├── ai.ts              # AI/LLM utilities
-│       ├── img-gen.ts         # Image generation
-│       └── prompt.ts          # Prompt handling
+│       ├── ai.ts              # AI/LLM utilities (Hyperbolic API)
+│       ├── helperFunction.ts  # Helper functions
+│       ├── img-gen.ts         # Image generation (Venice AI)
+│       ├── nfd.ts             # NFD registry utilities
+│       ├── nfd-mint.ts        # NFD name NFT minting
+│       └── prompt.ts          # Prompt formatting utilities
+├── backend/                   # Backend scraper and data processor
+│   ├── src/
+│   │   ├── scraper.ts         # Web scraper for ecosystem data
+│   │   └── data-processor.ts  # Data processing utilities
+│   └── scraped-data/          # Scraped and processed data
 ├── public/                    # Static assets
 ├── package.json               # Dependencies
 ├── next.config.ts             # Next.js configuration
@@ -184,13 +240,20 @@ algorand-trix/
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS
 - **Blockchain:** 
-  - Algorand SDK (`algosdk`, `@txnlab/use-wallet-react`)
-  - Ethereum/EVM (`ethers`, `viem`, `wagmi`)
-- **AI/ML:** OpenAI API (via Hyperbolic)
+  - **Algorand:** `algosdk`, `@txnlab/use-wallet-react`, `@algorandfoundation/algokit-utils`
+- **AI/ML:** 
+  - OpenAI API (via Hyperbolic.xyz)
+  - Venice AI (for NFT image generation)
+- **Storage:** 
+  - Filebase (IPFS storage for NFT metadata and images)
+  - MongoDB (for wallet registration and data persistence)
+- **Data Sources:**
+  - DefiLlama API (for lending and trading protocol data)
+  - NFD Registry API (for Algorand Name resolution)
 - **Wallets:** 
-  - Defly, Pera, WalletConnect, KMD, Kibisis, Lute, Magic
+  - Defly, Pera, WalletConnect, Biatec, KMD, Kibisis, Lute, Magic
 - **State Management:** TanStack Query (React Query)
-- **UI Components:** Radix UI, shadcn/ui
+- **UI Components:** Radix UI, shadcn/ui, Lucide React (icons)
 
 ---
 
@@ -200,12 +263,9 @@ The application supports multiple Algorand wallet providers:
 
 - **Defly Wallet**
 - **Pera Wallet**
-- **WalletConnect** (Project ID: `86a36faefc623df46385759a9ed566ac`)
-- **Biatec** (Project ID: `fcfde0713d43baa0d23be0773c80a72b`)
 - **KMD** (Kibble)
 - **Kibisis**
 - **Lute**
-- **Magic** (API Key: `pk_live_E8C27696B36E9AF8`)
 
 **Default Network:** Testnet
 
@@ -224,69 +284,110 @@ To change the network, modify the `defaultNetwork` in `src/app/page.tsx`.
 
 ## 🧪 Testing
 
+### Without Wallet Connection
+
+Try these prompts in the **General**, **Ecosystem Projects**, or **Algorand NFD Names** tabs:
+
+**General Tab:**
+- "What is Algorand?"
+- "Explain how DeFi lending works"
+- "How do I interact with smart contracts on Algorand?"
+
+**Ecosystem Projects Tab:**
+- "How many projects are in the Algorand ecosystem?"
+- "Show me all wallets"
+- "Find projects with GitHub repositories"
+- "Show me projects in DeFi category"
+- "Tell me about Pera Wallet"
+
+**Algorand NFD Names Tab:**
+- "Resolve address: [ALGORAND_ADDRESS]"
+- "Lookup name: myname.algo"
+- "Get all NFDs for address: [ALGORAND_ADDRESS]"
+
+**Algorand Helper Tab:**
+- "What are Algorand RPCs?"
+- "Explain account abstraction on Algorand"
+- "What oracles are available on Algorand?"
+- "How do indexers work?"
+
+### With Wallet Connection
+
 Connect your wallet and try these example prompts:
 
+**Swap & Trading:**
 - "Swap 10 ALGO to USDC"
-- "Lend 100 ALGO on Folks Finance"
-- "Mint an NFT with the prompt 'A futuristic cityscape'"
 - "Get quotes for swapping ALGO to ETH"
-- "How do I set up an Algorand RPC?"
+- "Show me trading opportunities"
 
----
+**Lending:**
+- "Lend 100 ALGO on Folks Finance"
+- "What are the best lending protocols?"
+- "Show me lending rates"
 
-## ⚠️ Important Notes
+**NFT & Tokens:**
+- "Mint an NFT with the prompt 'A futuristic cityscape'"
+- "Mint a token called MyToken with 1000000 supply"
+- "Transfer 100 USDC to [ADDRESS]"
+- "Send 50 ALGO to [ADDRESS]"
 
-1. **Environment Variables:** Never commit your `.env.local` file. It contains sensitive API keys and private keys.
+**Cross-Chain:**
+- "Transfer tokens from Algorand to Ethereum"
+- "Send OFT from chain 1 to chain 2"
 
-2. **Network:** The application is configured for **Testnet** by default. Change this in production.
+**Coding Helper:**
+- Type "generate_function" and provide a contract ABI JSON to get integration functions
 
-3. **Private Keys:** The `WALLET_PRIVATE_KEY` is used for server-side operations. Use a dedicated wallet for this purpose, not your main wallet.
 
-4. **API Keys:** Ensure all required API keys are valid and have sufficient credits/quota.
 
----
+## 📚 Feature Details
 
-## 🤝 Contributing
+### NFD Names Integration
+The application integrates with the Algorand NFD (Name) Registry to provide:
+- **Address Resolution:** Convert Algorand addresses to human-readable NFD names
+- **Reverse Lookup:** Find addresses from NFD names (e.g., `myname.algo`)
+- **Multi-NFD Discovery:** Get all NFD names associated with a single address
+- **View Types:** Support for tiny, thumbnail, brief, and full NFD data views
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+### Ecosystem Projects Explorer
+A comprehensive database of Algorand ecosystem projects with:
+- **Category Browsing:** Explore projects by category (Wallets, DEXs, DeFi, Tools, etc.)
+- **Search Functionality:** Find projects by name or description
+- **GitHub Integration:** Discover open-source projects with GitHub repositories
+- **Project Details:** Get website links, descriptions, and categorization
+- **Statistics:** View total project counts and category breakdowns
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+### Safe Wallet Integration
+Enterprise-grade wallet security with:
+- **Safe Deployment:** Automatically deploy Safe wallets for enhanced security
+- **Multi-sig Support:** Configure owners and threshold for multi-signature wallets
+- **DeFi Integration:** Deposit and approve tokens for DeFi operations via Safe
+- **CowSwap Integration:** Execute swaps through Safe wallets for added security
 
----
+### AI-Powered Features
+- **Natural Language Processing:** Understand user intent from conversational prompts
+- **Smart Routing:** Automatically route requests to appropriate blockchain operations
+- **Context Awareness:** Maintain conversation context for follow-up questions
+- **Code Generation:** Generate integration functions from contract ABIs automatically
 
-## 📄 License
-
-This project is private and proprietary.
-
----
-
-## 🆘 Troubleshooting
-
-### Issue: "OpenAI API key is missing"
-- **Solution:** Ensure `HYPERBOLIC_API_KEY` is set in your `.env.local` file.
-
-### Issue: "Venice API key or URL is missing"
-- **Solution:** Add both `VENICE_API_KEY` and `VENICE_API_BASE_URL` to your `.env.local` file.
-
-### Issue: Wallet connection fails
-- **Solution:** Check that your wallet extension is installed and unlocked. For WalletConnect, ensure the project ID is correct.
-
-### Issue: Build errors
-- **Solution:** Clear `.next` folder and `node_modules`, then reinstall dependencies:
-  ```bash
-  rm -rf .next node_modules
-  npm install
-  ```
 
 ---
 
 ## 📞 Support
 
 For issues, questions, or contributions, please open an issue on the repository.
+
+---
+
+## 🎯 Roadmap
+
+Future enhancements may include:
+- Additional blockchain network support
+- Enhanced cross-chain bridge integrations
+- More DeFi protocol integrations
+- Advanced trading strategies
+- Portfolio management features
+- Gas optimization tools
 
 ---
 
