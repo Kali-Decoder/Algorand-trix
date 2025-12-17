@@ -45,7 +45,7 @@
     "lucide-react": "^0.475.0",
     "lute-connect": "^1.6.2",
     "mongoose": "^8.13.2",
-    "next": "15.1.6",
+    "next": "15.1.11",
     "openai": "^4.83.0",
     "pino-pretty": "^13.0.0",
     "react": "^19.0.0",
